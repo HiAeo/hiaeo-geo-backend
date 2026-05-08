@@ -17,13 +17,14 @@ const common_1 = require("@nestjs/common");
 const swagger_1 = require("@nestjs/swagger");
 const content_service_1 = require("../services/content.service");
 const content_audit_service_1 = require("../services/content-audit.service");
-const create_content_dto_1 = require("../dto/create-content.dto");
-const query_content_dto_1 = require("../dto/query-content.dto");
+const content_generator_service_1 = require("../services/content-generator.service");
+const content_generation_dto_1 = require("../dto/content-generation.dto");
 const jwt_auth_guard_1 = require("../../auth/guards/jwt-auth.guard");
 let ContentController = class ContentController {
-    constructor(contentService, auditService) {
+    constructor(contentService, auditService, generatorService) {
         this.contentService = contentService;
         this.auditService = auditService;
+        this.generatorService = generatorService;
     }
     async create(createContentDto, req) {
         const content = await this.contentService.create(createContentDto, req.user?.id || 'system');
@@ -46,6 +47,25 @@ let ContentController = class ContentController {
         await this.auditService.logAction(id, req.user?.id || 'system', 'delete');
         return { message: '删除成功' };
     }
+    async generateSeoArticle(dto) {
+        return this.generatorService.generateSeoArticle(dto);
+    }
+    async generateFaq(dto) {
+        return this.generatorService.generateFaq(dto);
+    }
+    async generateJsonLd(dto) {
+        return this.generatorService.generateJsonLd(dto);
+    }
+    async generateProductDescription(dto) {
+        return this.generatorService.generateProductDescription(dto);
+    }
+    async optimizeContent(body) {
+        const optimized = await this.generatorService.optimizeContent(body.content, body.type);
+        return { content: optimized };
+    }
+    async checkSensitiveWords(body) {
+        return this.generatorService.checkSensitiveWords(body.content);
+    }
 };
 exports.ContentController = ContentController;
 __decorate([
@@ -54,7 +74,7 @@ __decorate([
     __param(0, (0, common_1.Body)()),
     __param(1, (0, common_1.Request)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [create_content_dto_1.CreateContentDto, Object]),
+    __metadata("design:paramtypes", [content_generation_dto_1.CreateContentDto, Object]),
     __metadata("design:returntype", Promise)
 ], ContentController.prototype, "create", null);
 __decorate([
@@ -62,7 +82,7 @@ __decorate([
     (0, swagger_1.ApiOperation)({ summary: '查询内容列表' }),
     __param(0, (0, common_1.Query)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [query_content_dto_1.QueryContentDto]),
+    __metadata("design:paramtypes", [content_generation_dto_1.QueryContentDto]),
     __metadata("design:returntype", Promise)
 ], ContentController.prototype, "findAll", null);
 __decorate([
@@ -92,12 +112,61 @@ __decorate([
     __metadata("design:paramtypes", [Number, Object]),
     __metadata("design:returntype", Promise)
 ], ContentController.prototype, "remove", null);
+__decorate([
+    (0, common_1.Post)('generate/seo-article'),
+    (0, swagger_1.ApiOperation)({ summary: '生成SEO文章' }),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [content_generation_dto_1.GenerateSeoArticleDto]),
+    __metadata("design:returntype", Promise)
+], ContentController.prototype, "generateSeoArticle", null);
+__decorate([
+    (0, common_1.Post)('generate/faq'),
+    (0, swagger_1.ApiOperation)({ summary: '生成FAQ问答' }),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [content_generation_dto_1.GenerateFaqDto]),
+    __metadata("design:returntype", Promise)
+], ContentController.prototype, "generateFaq", null);
+__decorate([
+    (0, common_1.Post)('generate/json-ld'),
+    (0, swagger_1.ApiOperation)({ summary: '生成JSON-LD结构化数据' }),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [content_generation_dto_1.GenerateJsonLdDto]),
+    __metadata("design:returntype", Promise)
+], ContentController.prototype, "generateJsonLd", null);
+__decorate([
+    (0, common_1.Post)('generate/product-description'),
+    (0, swagger_1.ApiOperation)({ summary: '生成产品描述' }),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [content_generation_dto_1.GenerateProductDescriptionDto]),
+    __metadata("design:returntype", Promise)
+], ContentController.prototype, "generateProductDescription", null);
+__decorate([
+    (0, common_1.Post)('optimize'),
+    (0, swagger_1.ApiOperation)({ summary: '优化内容' }),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], ContentController.prototype, "optimizeContent", null);
+__decorate([
+    (0, common_1.Post)('check-sensitive'),
+    (0, swagger_1.ApiOperation)({ summary: '检查敏感词' }),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], ContentController.prototype, "checkSensitiveWords", null);
 exports.ContentController = ContentController = __decorate([
     (0, swagger_1.ApiTags)('内容管理'),
     (0, swagger_1.ApiBearerAuth)(),
     (0, common_1.Controller)('content'),
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
     __metadata("design:paramtypes", [content_service_1.ContentService,
-        content_audit_service_1.ContentAuditService])
+        content_audit_service_1.ContentAuditService,
+        content_generator_service_1.ContentGeneratorService])
 ], ContentController);
 //# sourceMappingURL=content.controller.js.map

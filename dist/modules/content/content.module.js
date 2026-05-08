@@ -12,17 +12,22 @@ const typeorm_1 = require("@nestjs/typeorm");
 const content_controller_1 = require("./controllers/content.controller");
 const content_service_1 = require("./services/content.service");
 const content_audit_service_1 = require("./services/content-audit.service");
+const content_generator_service_1 = require("./services/content-generator.service");
 const content_entity_1 = require("./entities/content.entity");
 const content_audit_entity_1 = require("./entities/content-audit.entity");
+const ai_module_1 = require("../ai/ai.module");
 let ContentModule = class ContentModule {
 };
 exports.ContentModule = ContentModule;
 exports.ContentModule = ContentModule = __decorate([
     (0, common_1.Module)({
-        imports: [typeorm_1.TypeOrmModule.forFeature([content_entity_1.Content, content_audit_entity_1.ContentAudit])],
+        imports: [
+            typeorm_1.TypeOrmModule.forFeature([content_entity_1.Content, content_audit_entity_1.ContentAudit]),
+            ai_module_1.AiModule,
+        ],
         controllers: [content_controller_1.ContentController],
-        providers: [content_service_1.ContentService, content_audit_service_1.ContentAuditService],
-        exports: [content_service_1.ContentService]
+        providers: [content_service_1.ContentService, content_audit_service_1.ContentAuditService, content_generator_service_1.ContentGeneratorService],
+        exports: [content_service_1.ContentService, content_generator_service_1.ContentGeneratorService],
     })
 ], ContentModule);
 //# sourceMappingURL=content.module.js.map
