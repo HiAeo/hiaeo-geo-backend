@@ -30,6 +30,10 @@ __decorate([
     __metadata("design:type", String)
 ], Subscription.prototype, "userId", void 0);
 __decorate([
+    (0, typeorm_1.Column)({ name: 'organization_id', nullable: true }),
+    __metadata("design:type", String)
+], Subscription.prototype, "organizationId", void 0);
+__decorate([
     (0, typeorm_1.Column)({ name: 'package_id' }),
     __metadata("design:type", String)
 ], Subscription.prototype, "packageId", void 0);
@@ -39,7 +43,7 @@ __decorate([
 ], Subscription.prototype, "orderId", void 0);
 __decorate([
     (0, typeorm_1.Column)({
-        type: 'enum',
+        type: 'simple-enum',
         enum: SubscriptionStatus,
         default: SubscriptionStatus.ACTIVE,
     }),
@@ -61,6 +65,14 @@ __decorate([
     (0, typeorm_1.Column)({ name: 'diagnosis_limit', default: 10 }),
     __metadata("design:type", Number)
 ], Subscription.prototype, "diagnosisLimit", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ name: 'credits', default: 0 }),
+    __metadata("design:type", Number)
+], Subscription.prototype, "credits", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ name: 'credits_limit', default: 0 }),
+    __metadata("design:type", Number)
+], Subscription.prototype, "creditsLimit", void 0);
 __decorate([
     (0, typeorm_1.Column)({ name: 'auto_renew', default: true }),
     __metadata("design:type", Boolean)

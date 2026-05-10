@@ -113,6 +113,29 @@ let EngineManager = class EngineManager {
         }
         return adapter.chat(params);
     }
+    async diagnoseSEO(params, engine) {
+        const adapter = this.getEngine(engine);
+        if (!adapter) {
+            throw new Error(`Engine ${engine} not found`);
+        }
+        if (typeof adapter.diagnoseSEO === 'function') {
+            return adapter.diagnoseSEO(params);
+        }
+        console.warn(`引擎 ${adapter.name} 不支持SEO诊断`);
+        return {
+            seoScore: { overall: 60, technical: 60, content: 60, authority: 60, performance: 60 },
+            issues: [],
+            aiSearchPresence: { score: 50, coverage: 50, mentions: 0, sentiment: 'neutral' },
+            summary: '当前引擎不支持SEO诊断'
+        };
+    }
+    getAllEngines() {
+        return Array.from(this.engines.entries()).map(([key, adapter]) => ({
+            name: key,
+            displayName: adapter.name || key,
+            available: typeof adapter.isAvailable === 'function' ? adapter.isAvailable() : false
+        }));
+    }
     async checkEnginesHealth() {
         const statuses = [];
         for (const [name, adapter] of this.engines.entries()) {

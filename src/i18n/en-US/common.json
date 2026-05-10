@@ -1,0 +1,53 @@
+{
+  "buttons": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "search": "Search",
+    "export": "Export",
+    "confirm": "Confirm",
+    "submit": "Submit",
+    "reset": "Reset",
+    "close": "Close",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "upload": "Upload",
+    "download": "Download",
+    "refresh": "Refresh"
+  },
+  "status": {
+    "success": "Success",
+    "failed": "Failed",
+    "loading": "Loading...",
+    "noData": "No Data",
+    "error": "Error",
+    "warning": "Warning",
+    "info": "Info"
+  },
+  "messages": {
+    "saveSuccess": "Saved successfully",
+    "saveFailed": "Failed to save",
+    "deleteSuccess": "Deleted successfully",
+    "deleteFailed": "Failed to delete",
+    "operationSuccess": "Operation successful",
+    "operationFailed": "Operation failed",
+    "confirmDelete": "Are you sure you want to delete?",
+    "confirmSubmit": "Are you sure you want to submit?",
+    "networkError": "Network error, please try again later"
+  },
+  "validation": {
+    "required": "This field is required",
+    "invalidFormat": "Invalid format",
+    "minLength": "Must be at least {{min}} characters",
+    "maxLength": "Must not exceed {{max}} characters",
+    "invalidEmail": "Invalid email format",
+    "invalidUrl": "Invalid URL format"
+  },
+  "pagination": {
+    "total": "{{total}} items in total",
+    "page": "Page {{current}}",
+    "pageSize": "{{size}} items per page"
+  }
+}

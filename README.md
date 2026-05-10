@@ -28,6 +28,7 @@
 | `api-gateway` | API 网关 |
 | `billing` | 支付系统 |
 | `notification` | 通知系统 |
+| `i18n` | 多语言国际化支持 |
 
 ## 🛠 Tech Stack
 
@@ -230,6 +231,54 @@ npm run start:prod
 - Health check: `GET /health`
 - Terminus health indicators
 - Structured logging
+
+## 🌏 Internationalization (i18n)
+
+### Supported Languages
+
+- `zh-CN` - 简体中文 (Simplified Chinese)
+- `en-US` - English
+
+### API Endpoints
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/v1/i18n/locales` | Get supported languages list |
+| GET | `/api/v1/i18n/:locale` | Get language pack |
+| POST | `/api/v1/i18n/translate` | Translate text |
+| POST | `/api/v1/i18n/set-locale` | Set user locale preference |
+
+### Translation Files
+
+```
+src/i18n/
+├── zh-CN/
+│   ├── common.json    (Common translations)
+│   ├── knowledge.json (Knowledge base)
+│   ├── workflow.json  (Workflow)
+│   └── errors.json    (Error messages)
+└── en-US/
+    ├── common.json
+    ├── knowledge.json
+    ├── workflow.json
+    └── errors.json
+```
+
+### Usage Example
+
+```bash
+# Get locales
+curl -X GET http://localhost:3000/api/v1/i18n/locales -H "Authorization: Bearer <token>"
+
+# Get translations
+curl -X GET http://localhost:3000/api/v1/i18n/zh-CN -H "Authorization: Bearer <token>"
+
+# Translate text
+curl -X POST http://localhost:3000/api/v1/i18n/translate \
+  -H "Authorization: Bearer <token>" \
+  -H "Content-Type: application/json" \
+  -d '{"key": "knowledge.title", "locale": "zh-CN"}'
+```
 
 ## 🤝 Contributing
 

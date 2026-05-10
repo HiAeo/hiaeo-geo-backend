@@ -19,12 +19,6 @@ const order_service_1 = require("../services/order.service");
 const payment_service_1 = require("../services/payment.service");
 const coupon_service_1 = require("../services/coupon.service");
 const order_entity_1 = require("../entities/order.entity");
-class CreateOrderDto {
-}
-class RefundOrderDto {
-}
-class ValidateCouponDto {
-}
 let OrderController = class OrderController {
     constructor(orderService, paymentService, couponService) {
         this.orderService = orderService;
@@ -42,6 +36,15 @@ let OrderController = class OrderController {
     async getOrderStats(userId) {
         return this.orderService.getOrderStats(userId);
     }
+    async getOrderStatsSummary(userId) {
+        const stats = await this.orderService.getOrderStats(userId);
+        return {
+            totalOrders: stats.totalOrders || 0,
+            totalSpent: stats.totalSpent || 0,
+            paidOrders: stats.paidOrders || 0,
+            pendingOrders: stats.pendingOrders || 0,
+        };
+    }
     async getRefunds(userId) {
         return this.orderService.getRefunds(userId);
     }
@@ -51,25 +54,29 @@ let OrderController = class OrderController {
     async getOrderById(userId, id) {
         return this.orderService.getOrderById(id, userId);
     }
-    async createOrder(userId, dto) {
-        if (dto.couponCode) {
-            const couponResult = await this.couponService.validateCoupon(dto.couponCode, userId, dto.amount, dto.packageId);
-            if (couponResult.valid) {
-                dto.discount = couponResult.discount;
+    async createOrder(userId, body) {
+        if (body.couponCode) {
+            try {
+                const couponResult = await this.couponService.validateCoupon(body.couponCode, userId, body.amount, body.packageId);
+                if (couponResult.valid) {
+                    body.discount = couponResult.discount;
+                }
+            }
+            catch (e) {
             }
         }
-        return this.orderService.createOrder(userId, dto);
+        return this.orderService.createOrder(userId, body);
     }
     async cancelOrder(userId, id, reason) {
         return this.orderService.cancelOrder(id, userId, reason);
     }
-    async refundOrder(userId, id, dto) {
-        return this.orderService.refundOrder(id, userId, dto.reason);
+    async refundOrder(userId, id, body) {
+        return this.orderService.refundOrder(id, userId, body.reason);
     }
     async payOrder(userId, id, paymentMethod) {
         const payment = await this.orderService.createPayment(id, paymentMethod);
         const order = await this.orderService.getOrderById(id, userId);
-        const notifyUrl = `${process.env.API_BASE_URL || 'http://localhost:3000'}/api/v1/orders/callback/${paymentMethod.toLowerCase()}`;
+        const notifyUrl = `${process.env.API_BASE_URL || 'http://localhost:3000'}/api/orders/callback/${(paymentMethod || '').toLowerCase()}`;
         if (paymentMethod === order_entity_1.PaymentMethod.ALIPAY) {
             const result = await this.paymentService.alipayUnifiedOrder({
                 outTradeNo: payment.paymentNo,
@@ -93,36 +100,42 @@ let OrderController = class OrderController {
         }
         throw new Error('不支持的支付方式');
     }
-    async validateCoupon(userId, dto) {
-        return this.couponService.validateCoupon(dto.code, userId, dto.orderAmount, dto.packageId);
+    async validateCoupon(userId, body) {
+        return this.couponService.validateCoupon(body.code, userId, body.orderAmount, body.packageId);
     }
     async alipayCallback(params) {
         const verified = this.paymentService.verifyAlipayNotify(params);
         if (verified) {
-            await this.orderService.completeOrder(params.out_trade_no, {
-                orderId: params.out_trade_no,
-                paymentNo: params.trade_no,
-                status: params.trade_status,
-                transactionId: params.trade_no,
-                paidAmount: params.total_amount,
-                paidAt: params.gmt_payment,
-                channelResponse: params,
-            });
+            const payment = await this.orderService.getPaymentByPaymentNo(params.out_trade_no);
+            if (payment) {
+                await this.orderService.completeOrder(payment.orderId, {
+                    orderId: payment.orderId,
+                    paymentNo: params.trade_no,
+                    status: params.trade_status,
+                    transactionId: params.trade_no,
+                    paidAmount: params.total_amount,
+                    paidAt: params.gmt_payment,
+                    channelResponse: params,
+                });
+            }
         }
         return { success: verified };
     }
     async wechatCallback(params) {
         const verified = this.paymentService.verifyWechatNotify(params);
         if (verified) {
-            await this.orderService.completeOrder(params.out_trade_no, {
-                orderId: params.out_trade_no,
-                paymentNo: params.transaction_id,
-                status: params.result_code,
-                transactionId: params.transaction_id,
-                paidAmount: params.total_fee / 100,
-                paidAt: params.time_end,
-                channelResponse: params,
-            });
+            const payment = await this.orderService.getPaymentByPaymentNo(params.out_trade_no);
+            if (payment) {
+                await this.orderService.completeOrder(payment.orderId, {
+                    orderId: payment.orderId,
+                    paymentNo: params.transaction_id,
+                    status: params.result_code,
+                    transactionId: params.transaction_id,
+                    paidAmount: params.total_fee / 100,
+                    paidAt: params.time_end,
+                    channelResponse: params,
+                });
+            }
         }
         return { success: verified };
     }
@@ -145,7 +158,7 @@ __decorate([
     (0, common_1.Get)(),
     (0, swagger_1.ApiOperation)({ summary: '获取订单列表' }),
     (0, swagger_1.ApiHeader)({ name: 'x-user-id', description: '用户ID', required: true }),
-    (0, swagger_1.ApiQuery)({ name: 'status', required: false, enum: order_entity_1.OrderStatus }),
+    (0, swagger_1.ApiQuery)({ name: 'status', required: false }),
     (0, swagger_1.ApiQuery)({ name: 'page', required: false }),
     (0, swagger_1.ApiQuery)({ name: 'limit', required: false }),
     (0, swagger_1.ApiResponse)({ status: 200, description: '返回订单列表' }),
@@ -167,6 +180,16 @@ __decorate([
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", Promise)
 ], OrderController.prototype, "getOrderStats", null);
+__decorate([
+    (0, common_1.Get)('stats/summary'),
+    (0, swagger_1.ApiOperation)({ summary: '获取订单统计摘要（兼容前端）' }),
+    (0, swagger_1.ApiHeader)({ name: 'x-user-id', description: '用户ID', required: true }),
+    (0, swagger_1.ApiResponse)({ status: 200, description: '返回订单统计摘要' }),
+    __param(0, (0, common_1.Headers)('x-user-id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], OrderController.prototype, "getOrderStatsSummary", null);
 __decorate([
     (0, common_1.Get)('refunds'),
     (0, swagger_1.ApiOperation)({ summary: '获取退款记录' }),
@@ -206,7 +229,7 @@ __decorate([
     __param(0, (0, common_1.Headers)('x-user-id')),
     __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, CreateOrderDto]),
+    __metadata("design:paramtypes", [String, Object]),
     __metadata("design:returntype", Promise)
 ], OrderController.prototype, "createOrder", null);
 __decorate([
@@ -230,7 +253,7 @@ __decorate([
     __param(1, (0, common_1.Param)('id')),
     __param(2, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, String, RefundOrderDto]),
+    __metadata("design:paramtypes", [String, String, Object]),
     __metadata("design:returntype", Promise)
 ], OrderController.prototype, "refundOrder", null);
 __decorate([
@@ -253,7 +276,7 @@ __decorate([
     __param(0, (0, common_1.Headers)('x-user-id')),
     __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, ValidateCouponDto]),
+    __metadata("design:paramtypes", [String, Object]),
     __metadata("design:returntype", Promise)
 ], OrderController.prototype, "validateCoupon", null);
 __decorate([

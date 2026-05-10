@@ -57,7 +57,7 @@ __decorate([
     __metadata("design:type", Boolean)
 ], NotificationPreference.prototype, "emailEnabled", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ type: 'simple-array', nullable: true }),
+    (0, typeorm_1.Column)({ type: 'json', nullable: true }),
     __metadata("design:type", Array)
 ], NotificationPreference.prototype, "emailTypes", void 0);
 __decorate([
@@ -65,7 +65,7 @@ __decorate([
     __metadata("design:type", Boolean)
 ], NotificationPreference.prototype, "smsEnabled", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ type: 'simple-array', nullable: true }),
+    (0, typeorm_1.Column)({ type: 'json', nullable: true }),
     __metadata("design:type", Array)
 ], NotificationPreference.prototype, "smsTypes", void 0);
 __decorate([
@@ -85,7 +85,7 @@ __decorate([
     __metadata("design:type", Boolean)
 ], NotificationPreference.prototype, "marketingEnabled", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ type: 'enum', enum: ['realtime', 'hourly', 'daily'], default: 'realtime' }),
+    (0, typeorm_1.Column)({ type: 'simple-enum', enum: ['realtime', 'hourly', 'daily'], default: 'realtime' }),
     __metadata("design:type", String)
 ], NotificationPreference.prototype, "aggregationMode", void 0);
 __decorate([

@@ -45,9 +45,40 @@ export interface ChatResult {
         totalTokens: number;
     };
 }
+export interface SEODiagnosisParams {
+    targetUrl: string;
+    targetName?: string;
+    targetIndustry?: string;
+    keywords?: string[];
+}
+export interface SEODiagnosisResult {
+    seoScore: {
+        overall: number;
+        technical: number;
+        content: number;
+        authority: number;
+        performance: number;
+    };
+    issues: Array<{
+        category: string;
+        severity: 'high' | 'medium' | 'low';
+        title: string;
+        description: string;
+        recommendation: string;
+    }>;
+    aiSearchPresence: {
+        score: number;
+        coverage: number;
+        mentions: number;
+        sentiment: string;
+    };
+    summary: string;
+}
 export interface AIEngineAdapter {
     readonly name: string;
     diagnoseBrand(params: BrandDiagnosisParams): Promise<BrandDiagnosisResult>;
+    diagnoseSEO(params: SEODiagnosisParams): Promise<SEODiagnosisResult>;
     generateContent(params: ContentGenerationParams): Promise<ContentGenerationResult>;
     chat(params: ChatParams): Promise<ChatResult>;
+    isAvailable(): boolean;
 }

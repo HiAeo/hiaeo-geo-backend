@@ -14,6 +14,8 @@ export declare enum DiagnosisType {
 export declare class DiagnosisTask {
     id: string;
     userId: string;
+    organizationId: string;
+    brandId: string;
     brandName: string;
     website: string;
     industry: string;

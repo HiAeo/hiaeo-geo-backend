@@ -68,11 +68,11 @@ __decorate([
     __metadata("design:type", String)
 ], ApiKey.prototype, "description", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ type: 'simple-array', nullable: true }),
+    (0, typeorm_1.Column)({ type: 'json', nullable: true }),
     __metadata("design:type", Array)
 ], ApiKey.prototype, "scopes", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ type: 'enum', enum: ApiKeyStatus, default: ApiKeyStatus.ACTIVE }),
+    (0, typeorm_1.Column)({ type: 'simple-enum', enum: ApiKeyStatus, default: ApiKeyStatus.ACTIVE }),
     __metadata("design:type", String)
 ], ApiKey.prototype, "status", void 0);
 __decorate([
@@ -88,11 +88,11 @@ __decorate([
     __metadata("design:type", Number)
 ], ApiKey.prototype, "usedCount", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ type: 'timestamp', nullable: true }),
+    (0, typeorm_1.Column)({ type: 'datetime', nullable: true }),
     __metadata("design:type", Date)
 ], ApiKey.prototype, "expiresAt", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ type: 'timestamp', nullable: true }),
+    (0, typeorm_1.Column)({ type: 'datetime', nullable: true }),
     __metadata("design:type", Date)
 ], ApiKey.prototype, "lastUsedAt", void 0);
 __decorate([
@@ -117,7 +117,6 @@ __decorate([
 ], ApiKey.prototype, "createdBy", void 0);
 exports.ApiKey = ApiKey = __decorate([
     (0, typeorm_1.Entity)('api_keys'),
-    (0, typeorm_1.Index)(['organizationId', 'status']),
-    (0, typeorm_1.Index)(['key'])
+    (0, typeorm_1.Index)(['organizationId', 'status'])
 ], ApiKey);
 //# sourceMappingURL=api-key.entity.js.map

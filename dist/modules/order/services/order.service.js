@@ -23,14 +23,16 @@ const package_service_1 = require("../../package/services/package.service");
 const subscription_service_1 = require("../../subscription/services/subscription.service");
 const credit_service_1 = require("../../subscription/services/credit.service");
 const credit_entity_1 = require("../../subscription/entities/credit.entity");
+const invitation_service_1 = require("../../invitation/services/invitation.service");
 let OrderService = class OrderService {
-    constructor(orderRepository, paymentRepository, refundRepository, packageService, subscriptionService, creditService, dataSource) {
+    constructor(orderRepository, paymentRepository, refundRepository, packageService, subscriptionService, creditService, invitationService, dataSource) {
         this.orderRepository = orderRepository;
         this.paymentRepository = paymentRepository;
         this.refundRepository = refundRepository;
         this.packageService = packageService;
         this.subscriptionService = subscriptionService;
         this.creditService = creditService;
+        this.invitationService = invitationService;
         this.dataSource = dataSource;
     }
     async createOrder(userId, dto) {
@@ -167,6 +169,9 @@ let OrderService = class OrderService {
         }
         return payment;
     }
+    async getPaymentByPaymentNo(paymentNo) {
+        return this.paymentRepository.findOne({ where: { paymentNo } });
+    }
     async completeOrder(orderId, callback) {
         const queryRunner = this.dataSource.createQueryRunner();
         await queryRunner.connect();
@@ -213,6 +218,12 @@ let OrderService = class OrderService {
                 catch (error) {
                     console.error('创建订阅失败:', error);
                 }
+            }
+            try {
+                await this.invitationService.completeInvitation(orderId, order.userId);
+            }
+            catch (error) {
+                console.error('完成邀请奖励失败:', error);
             }
             await queryRunner.commitTransaction();
             return {
@@ -321,6 +332,7 @@ exports.OrderService = OrderService = __decorate([
         package_service_1.PackageService,
         subscription_service_1.SubscriptionService,
         credit_service_1.CreditService,
+        invitation_service_1.InvitationService,
         typeorm_2.DataSource])
 ], OrderService);
 //# sourceMappingURL=order.service.js.map

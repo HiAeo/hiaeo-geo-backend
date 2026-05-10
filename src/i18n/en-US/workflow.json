@@ -1,0 +1,48 @@
+{
+  "title": "Automation Workflow",
+  "workflowList": "Workflow List",
+  "createWorkflow": "Create Workflow",
+  "editWorkflow": "Edit Workflow",
+  "deleteWorkflow": "Delete Workflow",
+  "workflowName": "Workflow Name",
+  "workflowDescription": "Workflow Description",
+  "workflowStatus": "Status",
+  "workflowType": "Type",
+  "triggers": {
+    "title": "Triggers",
+    "scheduled": "Scheduled",
+    "manual": "Manual",
+    "event": "Event",
+    "cron": "Cron Expression",
+    "interval": "Execution Interval"
+  },
+  "actions": {
+    "title": "Actions",
+    "run": "Run",
+    "pause": "Pause",
+    "resume": "Resume",
+    "stop": "Stop",
+    "viewLogs": "View Logs"
+  },
+  "status": {
+    "active": "Running",
+    "paused": "Paused",
+    "stopped": "Stopped",
+    "failed": "Failed",
+    "completed": "Completed"
+  },
+  "history": {
+    "title": "Execution History",
+    "startTime": "Start Time",
+    "endTime": "End Time",
+    "duration": "Duration",
+    "result": "Result"
+  },
+  "messages": {
+    "createSuccess": "Workflow created successfully",
+    "updateSuccess": "Workflow updated successfully",
+    "deleteSuccess": "Workflow deleted successfully",
+    "runSuccess": "Workflow execution started",
+    "confirmDelete": "Are you sure you want to delete this workflow?"
+  }
+}

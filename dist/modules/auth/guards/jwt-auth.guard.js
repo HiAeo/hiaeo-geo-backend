@@ -12,17 +12,29 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.JwtAuthGuard = void 0;
 const common_1 = require("@nestjs/common");
 const core_1 = require("@nestjs/core");
+const auth_service_1 = require("../auth.service");
 let JwtAuthGuard = class JwtAuthGuard {
-    constructor(reflector) {
+    constructor(reflector, authService) {
         this.reflector = reflector;
+        this.authService = authService;
     }
-    canActivate(context) {
+    async canActivate(context) {
         const request = context.switchToHttp().getRequest();
         const token = this.extractTokenFromHeader(request);
         if (!token) {
             throw new common_1.UnauthorizedException('未提供认证令牌');
         }
-        return true;
+        try {
+            const user = await this.authService.validateToken(token);
+            request.user = user;
+            return true;
+        }
+        catch (error) {
+            if (error.message?.includes('令牌')) {
+                throw error;
+            }
+            throw new common_1.UnauthorizedException('认证失败，请重新登录');
+        }
     }
     extractTokenFromHeader(request) {
         const [type, token] = request.headers.authorization?.split(' ') ?? [];
@@ -32,6 +44,7 @@ let JwtAuthGuard = class JwtAuthGuard {
 exports.JwtAuthGuard = JwtAuthGuard;
 exports.JwtAuthGuard = JwtAuthGuard = __decorate([
     (0, common_1.Injectable)(),
-    __metadata("design:paramtypes", [core_1.Reflector])
+    __metadata("design:paramtypes", [core_1.Reflector,
+        auth_service_1.AuthService])
 ], JwtAuthGuard);
 //# sourceMappingURL=jwt-auth.guard.js.map

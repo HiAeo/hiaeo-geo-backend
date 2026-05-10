@@ -4,7 +4,7 @@ import { QwenAdapter } from './qwen.adapter';
 import { ZhipuAdapter } from './zhipu.adapter';
 import { DoubaoAdapter } from './doubao.adapter';
 import { WenxinAdapter } from './wenxin.adapter';
-import { BrandDiagnosisParams, BrandDiagnosisResult, ContentGenerationParams, ContentGenerationResult, ChatParams, ChatResult } from '../interfaces/ai-engine.interface';
+import { BrandDiagnosisParams, BrandDiagnosisResult, ContentGenerationParams, ContentGenerationResult, ChatParams, ChatResult, SEODiagnosisParams, SEODiagnosisResult } from '../interfaces/ai-engine.interface';
 export interface AggregatedDiagnosisResult {
     brandPositioning: string;
     competitiveAdvantages: string[];
@@ -37,5 +37,11 @@ export declare class EngineManager {
     batchDiagnose(params: BrandDiagnosisParams, engines?: string[]): Promise<AggregatedDiagnosisResult>;
     generateContent(params: ContentGenerationParams, engine?: string): Promise<ContentGenerationResult>;
     chat(params: ChatParams, engine?: string): Promise<ChatResult>;
+    diagnoseSEO(params: SEODiagnosisParams, engine?: string): Promise<SEODiagnosisResult>;
+    getAllEngines(): Array<{
+        name: string;
+        displayName: string;
+        available: boolean;
+    }>;
     checkEnginesHealth(): Promise<EngineHealthStatus[]>;
 }

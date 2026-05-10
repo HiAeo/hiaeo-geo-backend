@@ -21,8 +21,9 @@ let PaymentService = class PaymentService {
         const appId = this.configService.get('ALIPAY_APP_ID', '');
         const privateKey = this.configService.get('ALIPAY_PRIVATE_KEY', '');
         const alipayPublicKey = this.configService.get('ALIPAY_PUBLIC_KEY', '');
+        const mockPayment = this.configService.get('MOCK_PAYMENT', 'true') === 'true';
         if (!appId || !privateKey || !alipayPublicKey) {
-            if (process.env.NODE_ENV === 'development') {
+            if (process.env.NODE_ENV === 'development' || mockPayment) {
                 return {
                     success: true,
                     paymentUrl: `https://openapi.alipay.com/gateway.do?mock=true&outTradeNo=${params.outTradeNo}`,
@@ -57,8 +58,9 @@ let PaymentService = class PaymentService {
         const mchId = this.configService.get('WECHAT_MCH_ID', '');
         const apiKey = this.configService.get('WECHAT_API_KEY', '');
         const appId = this.configService.get('WECHAT_APP_ID', '');
+        const mockPayment = this.configService.get('MOCK_PAYMENT', 'true') === 'true';
         if (!mchId || !apiKey || !appId) {
-            if (process.env.NODE_ENV === 'development') {
+            if (process.env.NODE_ENV === 'development' || mockPayment) {
                 return {
                     success: true,
                     codeUrl: `weixin://wxpay/bizpayurl?pr=${Date.now()}`,
@@ -83,7 +85,8 @@ let PaymentService = class PaymentService {
         }
     }
     verifyAlipayNotify(params) {
-        return params.tradeStatus === 'TRADE_SUCCESS' || params.tradeStatus === 'TRADE_FINISHED';
+        const tradeStatus = params.trade_status || params.tradeStatus;
+        return tradeStatus === 'TRADE_SUCCESS' || tradeStatus === 'TRADE_FINISHED';
     }
     verifyWechatNotify(params) {
         return params.result_code === 'SUCCESS' && params.return_code === 'SUCCESS';

@@ -21,7 +21,8 @@ export class Payment {
   paymentNo: string;
 
   @Column({
-    type: 'enum',
+    name: 'status',
+    type: 'simple-enum',
     enum: PaymentStatus,
     default: PaymentStatus.PENDING,
   })
@@ -48,10 +49,10 @@ export class Payment {
   @Column({ name: 'expire_at' })
   expireAt: Date;
 
-  @Column({ type: 'jsonb', nullable: true })
+  @Column({ name: 'channel_response', type: 'json', nullable: true })
   channelResponse: Record<string, any>;
 
-  @Column({ type: 'jsonb', nullable: true })
+  @Column({ type: 'json', nullable: true })
   metadata: Record<string, any>;
 
   @CreateDateColumn({ name: 'created_at' })

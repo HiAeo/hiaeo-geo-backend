@@ -1,7 +1,71 @@
 import { HubService } from '../services/hub.service';
+import { KnowledgeDataSourceService } from '../services/knowledge-data-source.service';
 export declare class HubController {
     private readonly hubService;
-    constructor(hubService: HubService);
+    private readonly knowledgeDataSourceService;
+    constructor(hubService: HubService, knowledgeDataSourceService: KnowledgeDataSourceService);
+    getKnowledgeHealth(req: any): Promise<{
+        success: boolean;
+        message: string;
+        data?: undefined;
+    } | {
+        success: boolean;
+        data: {
+            completenessScore: number;
+            healthLevel: "excellent" | "good" | "fair" | "poor";
+            dimensionScores: Record<string, number>;
+            lastDiagnosisScore: number | null;
+            versionHistory: {
+                version: number;
+                date: string;
+            }[];
+            recommendations: string[];
+        };
+        message?: undefined;
+    }>;
+    getKnowledgeStats(): Promise<{
+        success: boolean;
+        data: {
+            totalOrganizations: number;
+            withCompleteKnowledge: number;
+            avgCompleteness: number;
+            topIndustries: {
+                industry: string;
+                count: number;
+            }[];
+        };
+    }>;
+    getKnowledgeTrend(req: any, days?: string): Promise<{
+        success: boolean;
+        message: string;
+        data?: undefined;
+    } | {
+        success: boolean;
+        data: {
+            trend: {
+                date: string;
+                score: number;
+            }[];
+            direction: "up" | "down" | "stable";
+            changePercent: number;
+        };
+        message?: undefined;
+    }>;
+    getKnowledgeDiagnosisCorrelation(req: any): Promise<{
+        success: boolean;
+        message: string;
+        data?: undefined;
+    } | {
+        success: boolean;
+        data: {
+            diagnosisCount: number;
+            avgScore: number;
+            bestDimension: string;
+            worstDimension: string;
+            improvementTrend: "improving" | "declining" | "stable";
+        };
+        message?: undefined;
+    }>;
     getStats(brandId?: string): Promise<{
         success: boolean;
         data: {
@@ -13,67 +77,44 @@ export declare class HubController {
             freeUsers: number;
             proUsers: number;
             enterpriseUsers: number;
+            totalBrands: number;
+            totalDiagnoses: number;
+            completedDiagnoses: number;
+            totalContent: number;
+            publishedContent: number;
         };
     }>;
     getBossView(brandId?: string): Promise<{
         success: boolean;
         data: {
-            stats: {
-                geoScore: number;
-                industryAvg: number;
-                mentionRate: number;
-                mentionTarget: number;
-                competitorSuppression: number;
-                competitorCount: number;
-                roi: number;
-            };
+            stats: import("../services/data-source.service").BrandStats;
             brandId: string | undefined;
         };
     }>;
     getOpsView(brandId?: string): Promise<{
         success: boolean;
         data: {
-            stats: {
-                pendingCount: number;
-                totalContent: number;
-                publishedContent: number;
-                pendingContent: number;
-                avgEngagement: number;
-            };
+            stats: import("../services/data-source.service").OpsStats;
             pendingTasks: {
-                success: boolean;
-                data: {
-                    id: number;
-                    title: string;
-                    style: string;
-                    platform: string;
-                    impact: number;
-                    status: string;
-                }[];
-                brandId: string | undefined;
-            };
+                id: string;
+                title: string;
+                style: string;
+                platform: string;
+                impact: number;
+                status: string;
+            }[];
             suggestions: {
-                success: boolean;
-                data: {
-                    text: string;
-                    tag: string;
-                    priority: string;
-                }[];
-                brandId: string | undefined;
-            };
+                text: string;
+                tag: string;
+                priority: "high" | "medium" | "low";
+            }[];
             brandId: string | undefined;
         };
     }>;
     getTechView(brandId?: string): Promise<{
         success: boolean;
         data: {
-            stats: {
-                apiHealth: number;
-                crawlerScore: number;
-                schemaScore: number;
-                performance: number;
-                pendingTasks: number;
-            };
+            stats: import("../services/data-source.service").TechStats;
             tasks: {
                 id: number;
                 title: string;
@@ -93,7 +134,7 @@ export declare class HubController {
     getBrandRanking(): Promise<{
         success: boolean;
         data: {
-            id: number;
+            id: string;
             name: string;
             score: number;
             mentionRate: number;
@@ -112,7 +153,7 @@ export declare class HubController {
     getPendingTasks(brandId?: string): Promise<{
         success: boolean;
         data: {
-            id: number;
+            id: string;
             title: string;
             style: string;
             platform: string;
@@ -126,7 +167,7 @@ export declare class HubController {
         data: {
             text: string;
             tag: string;
-            priority: string;
+            priority: "high" | "medium" | "low";
         }[];
         brandId: string | undefined;
     }>;

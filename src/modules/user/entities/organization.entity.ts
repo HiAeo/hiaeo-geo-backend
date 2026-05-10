@@ -40,10 +40,10 @@ export class Organization {
   @Column({ type: 'varchar', length: 100, nullable: true })
   shortName: string;
 
-  @Column({ type: 'enum', enum: OrganizationType, default: OrganizationType.INDIVIDUAL })
+  @Column({ type: 'simple-enum', enum: OrganizationType, default: OrganizationType.INDIVIDUAL })
   type: OrganizationType;
 
-  @Column({ type: 'enum', enum: OrganizationTier, default: OrganizationTier.FREE })
+  @Column({ type: 'simple-enum', enum: OrganizationTier, default: OrganizationTier.FREE })
   tier: OrganizationTier;
 
   @Column({ type: 'text', nullable: true })
@@ -76,10 +76,10 @@ export class Organization {
   @Column({ type: 'json', default: '{}' })
   settings: Record<string, any>;
 
-  @Column({ type: 'timestamp', nullable: true })
+  @Column({ type: 'datetime', nullable: true })
   trialEndsAt: Date;
 
-  @Column({ type: 'timestamp', nullable: true })
+  @Column({ type: 'datetime', nullable: true })
   subscriptionEndsAt: Date;
 
   @Column({ type: 'boolean', default: true })

@@ -1,17 +1,17 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const core_1 = require("@nestjs/core");
-const common_1 = require("@nestjs/common");
 const swagger_1 = require("@nestjs/swagger");
+const common_1 = require("@nestjs/common");
 const app_module_1 = require("./app.module");
 async function bootstrap() {
     const app = await core_1.NestFactory.create(app_module_1.AppModule);
-    app.setGlobalPrefix('api');
     app.useGlobalPipes(new common_1.ValidationPipe({
-        whitelist: true,
+        whitelist: false,
         transform: true,
-        forbidNonWhitelisted: true,
+        forbidNonWhitelisted: false,
     }));
+    app.setGlobalPrefix('api');
     app.enableCors({
         origin: process.env.CORS_ORIGIN || '*',
         methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',

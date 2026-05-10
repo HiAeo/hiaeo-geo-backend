@@ -22,14 +22,14 @@ export class NotificationPreference {
   @Column({ type: 'boolean', default: true })
   emailEnabled: boolean;  // 是否启用邮件
 
-  @Column({ type: 'simple-array', nullable: true })
+  @Column({ type: 'json', nullable: true })
   emailTypes: string[];  // 允许的邮件通知类型
 
   // 短信通知设置
   @Column({ type: 'boolean', default: true })
   smsEnabled: boolean;
 
-  @Column({ type: 'simple-array', nullable: true })
+  @Column({ type: 'json', nullable: true })
   smsTypes: string[];  // 允许的短信通知类型
 
   // 免打扰时段
@@ -47,7 +47,7 @@ export class NotificationPreference {
   marketingEnabled: boolean;  // 是否接收营销通知
 
   // 聚合设置
-  @Column({ type: 'enum', enum: ['realtime', 'hourly', 'daily'], default: 'realtime' })
+  @Column({ type: 'simple-enum', enum: ['realtime', 'hourly', 'daily'], default: 'realtime' })
   aggregationMode: 'realtime' | 'hourly' | 'daily';
 
   @UpdateDateColumn()

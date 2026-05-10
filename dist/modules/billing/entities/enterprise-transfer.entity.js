@@ -35,7 +35,7 @@ __decorate([
     __metadata("design:type", String)
 ], EnterpriseTransfer.prototype, "transferNo", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ type: 'enum', enum: TransferStatus, default: TransferStatus.PENDING }),
+    (0, typeorm_1.Column)({ type: 'simple-enum', enum: TransferStatus, default: TransferStatus.PENDING }),
     __metadata("design:type", String)
 ], EnterpriseTransfer.prototype, "status", void 0);
 __decorate([
@@ -83,7 +83,7 @@ __decorate([
     __metadata("design:type", String)
 ], EnterpriseTransfer.prototype, "serialNo", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ type: 'enum', enum: TransferStatus, default: TransferStatus.PENDING }),
+    (0, typeorm_1.Column)({ type: 'simple-enum', enum: TransferStatus, default: TransferStatus.PENDING }),
     __metadata("design:type", String)
 ], EnterpriseTransfer.prototype, "verifiedStatus", void 0);
 __decorate([
@@ -91,7 +91,7 @@ __decorate([
     __metadata("design:type", String)
 ], EnterpriseTransfer.prototype, "verifiedBy", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ type: 'timestamp', nullable: true }),
+    (0, typeorm_1.Column)({ type: 'datetime', nullable: true }),
     __metadata("design:type", Date)
 ], EnterpriseTransfer.prototype, "verifiedAt", void 0);
 __decorate([

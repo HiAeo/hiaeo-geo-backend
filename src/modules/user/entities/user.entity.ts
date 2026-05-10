@@ -6,6 +6,7 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   ManyToOne,
+  OneToMany,
   JoinColumn,
   Index,
 } from 'typeorm';
@@ -25,7 +26,6 @@ export enum UserStatus {
  * 用户实体 - 支持多租户
  */
 @Entity('users')
-@Index(['organizationId', 'email'])
 @Index(['organizationId', 'status'])
 export class User {
   @PrimaryGeneratedColumn('uuid')
@@ -46,8 +46,8 @@ export class User {
   @Column({ type: 'varchar', length: 255, nullable: true })
   avatar: string;
 
-  @Column({ type: 'enum', enum: UserStatus, default: UserStatus.PENDING })
-  status: UserStatus;
+  @Column({ type: 'varchar', length: 20, default: UserStatus.PENDING })
+  status: string;
 
   @Column({ type: 'uuid' })
   organizationId: string;
@@ -62,10 +62,15 @@ export class User {
   @JoinColumn({ name: 'roleId' })
   role: Role;
 
+  // 品牌知识库角色关联 (在 auth 模块中定义)
+  // 注意：这里使用字符串引用避免循环依赖
+  // @OneToMany(() => UserRole, userRole => userRole.user)
+  // userRoles: UserRole[];
+
   @Column({ type: 'json', default: '{}' })
   profile: Record<string, any>;  // 扩展信息
 
-  @Column({ type: 'timestamp', nullable: true })
+  @Column({ type: 'datetime', nullable: true })
   lastLoginAt: Date;
 
   @Column({ type: 'varchar', length: 50, nullable: true })
@@ -80,7 +85,7 @@ export class User {
   @Column({ type: 'varchar', length: 255, nullable: true })
   passwordResetToken: string;
 
-  @Column({ type: 'timestamp', nullable: true })
+  @Column({ type: 'datetime', nullable: true })
   passwordResetExpires: Date;
 
   @CreateDateColumn()

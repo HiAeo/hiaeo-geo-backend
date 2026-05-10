@@ -39,10 +39,11 @@ export class PaymentService {
     const appId = this.configService.get('ALIPAY_APP_ID', '');
     const privateKey = this.configService.get('ALIPAY_PRIVATE_KEY', '');
     const alipayPublicKey = this.configService.get('ALIPAY_PUBLIC_KEY', '');
+    const mockPayment = this.configService.get('MOCK_PAYMENT', 'true') === 'true';
 
     if (!appId || !privateKey || !alipayPublicKey) {
-      // 开发环境返回模拟数据
-      if (process.env.NODE_ENV === 'development') {
+      // 开发环境或启用模拟支付时返回模拟数据
+      if (process.env.NODE_ENV === 'development' || mockPayment) {
         return {
           success: true,
           paymentUrl: `https://openapi.alipay.com/gateway.do?mock=true&outTradeNo=${params.outTradeNo}`,
@@ -85,10 +86,11 @@ export class PaymentService {
     const mchId = this.configService.get('WECHAT_MCH_ID', '');
     const apiKey = this.configService.get('WECHAT_API_KEY', '');
     const appId = this.configService.get('WECHAT_APP_ID', '');
+    const mockPayment = this.configService.get('MOCK_PAYMENT', 'true') === 'true';
 
     if (!mchId || !apiKey || !appId) {
-      // 开发环境返回模拟数据
-      if (process.env.NODE_ENV === 'development') {
+      // 开发环境或启用模拟支付时返回模拟数据
+      if (process.env.NODE_ENV === 'development' || mockPayment) {
         return {
           success: true,
           codeUrl: `weixin://wxpay/bizpayurl?pr=${Date.now()}`,
@@ -120,10 +122,11 @@ export class PaymentService {
   /**
    * 支付宝回调验证
    */
-  verifyAlipayNotify(params: PayNotifyParams): boolean {
+  verifyAlipayNotify(params: any): boolean {
     // 实际实现需要使用支付宝 SDK 验证签名
-    // 这里简化处理
-    return params.tradeStatus === 'TRADE_SUCCESS' || params.tradeStatus === 'TRADE_FINISHED';
+    // 这里简化处理：检查 trade_status 或 tradeStatus
+    const tradeStatus = params.trade_status || params.tradeStatus;
+    return tradeStatus === 'TRADE_SUCCESS' || tradeStatus === 'TRADE_FINISHED';
   }
 
   /**

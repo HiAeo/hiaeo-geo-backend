@@ -10,14 +10,7 @@ interface AIAnalysisResult {
         problems: string[];
     }[];
     suggestions: string[];
-    issues: {
-        id: string;
-        title: string;
-        description: string;
-        severity: string;
-        impact: string;
-        solution: string;
-    }[];
+    issues: any[];
 }
 export declare class IssueIdentifierService {
     identify(aiResult: AIAnalysisResult, enginesUsed: string[]): IssueAnalysisResult;

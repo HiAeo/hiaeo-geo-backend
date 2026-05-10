@@ -26,6 +26,12 @@ let AiController = class AiController {
     async getEngineList() {
         return this.aiService.getEngineList();
     }
+    async getEngineHealthStatus() {
+        return this.aiService.getEngineHealthStatus();
+    }
+    async recommendEngine(taskType) {
+        return this.aiService.recommendEngine(taskType);
+    }
     async diagnose(dto, engine) {
         return this.aiService.diagnose(dto, engine);
     }
@@ -48,6 +54,24 @@ __decorate([
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", Promise)
 ], AiController.prototype, "getEngineList", null);
+__decorate([
+    (0, common_1.Get)('engines/health'),
+    (0, swagger_1.ApiOperation)({ summary: '获取引擎健康状态' }),
+    (0, swagger_1.ApiResponse)({ status: 200, description: '返回所有引擎的健康状态' }),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", Promise)
+], AiController.prototype, "getEngineHealthStatus", null);
+__decorate([
+    (0, common_1.Get)('engines/recommend'),
+    (0, swagger_1.ApiOperation)({ summary: '推荐最佳引擎' }),
+    (0, swagger_1.ApiQuery)({ name: 'taskType', required: true, description: '任务类型: diagnosis, content, chat' }),
+    (0, swagger_1.ApiResponse)({ status: 200, description: '返回推荐的引擎名称' }),
+    __param(0, (0, common_1.Query)('taskType')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], AiController.prototype, "recommendEngine", null);
 __decorate([
     (0, common_1.Post)('diagnose'),
     (0, swagger_1.ApiOperation)({ summary: '品牌GEO诊断' }),

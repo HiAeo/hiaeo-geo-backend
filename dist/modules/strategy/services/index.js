@@ -15,4 +15,6 @@ var __exportStar = (this && this.__exportStar) || function(m, exports) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 __exportStar(require("./strategy.service"), exports);
+__exportStar(require("./mofa-strategy.service"), exports);
+__exportStar(require("./knowledge-aware-strategy.service"), exports);
 //# sourceMappingURL=index.js.map

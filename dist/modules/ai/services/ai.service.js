@@ -17,7 +17,31 @@ let AiService = class AiService {
         this.engineManager = engineManager;
     }
     async getEngineList() {
-        return this.engineManager.getAvailableEngines();
+        const engines = this.engineManager.getAvailableEngines();
+        return engines.map(name => ({
+            name,
+            displayName: this.getEngineDisplayName(name),
+        }));
+    }
+    async getEngineHealthStatus() {
+        return this.engineManager.checkEnginesHealth();
+    }
+    async recommendEngine(taskType) {
+        const healthStatus = await this.engineManager.checkEnginesHealth();
+        const healthyEngines = healthStatus.filter(s => s.healthy);
+        if (healthyEngines.length === 0) {
+            return 'deepseek';
+        }
+        switch (taskType) {
+            case 'diagnosis':
+                return 'deepseek';
+            case 'content':
+                return 'kimi';
+            case 'chat':
+                return 'qwen';
+            default:
+                return healthyEngines[0].name;
+        }
     }
     async diagnose(params, engineType) {
         return this.engineManager.diagnoseBrand(params, engineType);
@@ -30,6 +54,17 @@ let AiService = class AiService {
     }
     async chat(params, engineType) {
         return this.engineManager.chat(params, engineType);
+    }
+    getEngineDisplayName(name) {
+        const names = {
+            deepseek: 'DeepSeek',
+            kimi: 'Kimi',
+            qwen: '通义千问',
+            zhipu: '智谱AI',
+            doubao: '豆包',
+            wenxin: '文心一言',
+        };
+        return names[name] || name;
     }
 };
 exports.AiService = AiService;

@@ -55,7 +55,7 @@ __decorate([
     __metadata("design:type", String)
 ], User.prototype, "avatar", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ type: 'enum', enum: UserStatus, default: UserStatus.PENDING }),
+    (0, typeorm_1.Column)({ type: 'varchar', length: 20, default: UserStatus.PENDING }),
     __metadata("design:type", String)
 ], User.prototype, "status", void 0);
 __decorate([
@@ -80,7 +80,7 @@ __decorate([
     __metadata("design:type", Object)
 ], User.prototype, "profile", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ type: 'timestamp', nullable: true }),
+    (0, typeorm_1.Column)({ type: 'datetime', nullable: true }),
     __metadata("design:type", Date)
 ], User.prototype, "lastLoginAt", void 0);
 __decorate([
@@ -100,7 +100,7 @@ __decorate([
     __metadata("design:type", String)
 ], User.prototype, "passwordResetToken", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ type: 'timestamp', nullable: true }),
+    (0, typeorm_1.Column)({ type: 'datetime', nullable: true }),
     __metadata("design:type", Date)
 ], User.prototype, "passwordResetExpires", void 0);
 __decorate([
@@ -121,7 +121,6 @@ __decorate([
 ], User.prototype, "updatedBy", void 0);
 exports.User = User = __decorate([
     (0, typeorm_1.Entity)('users'),
-    (0, typeorm_1.Index)(['organizationId', 'email']),
     (0, typeorm_1.Index)(['organizationId', 'status'])
 ], User);
 //# sourceMappingURL=user.entity.js.map

@@ -15,14 +15,7 @@ interface AIAnalysisResult {
     problems: string[];
   }[];
   suggestions: string[];
-  issues: {
-    id: string;
-    title: string;
-    description: string;
-    severity: string;
-    impact: string;
-    solution: string;
-  }[];
+  issues: any[];
 }
 
 // 问题分类映射
@@ -82,26 +75,35 @@ export class IssueIdentifierService {
    * 从AI诊断结果提取问题
    */
   private extractFromAIResult(result: AIAnalysisResult): IdentifiedIssue[] {
-    return result.issues.map((issue, index) => ({
-      id: issue.id || `issue_ai_${index + 1}`,
-      category: this.categorizeIssue(issue.title),
-      title: issue.title,
-      description: issue.description,
-      severity: this.normalizeSeverity(issue.severity),
-      impact: {
-        dimension: this.inferAffectedDimension(issue),
-        scoreImpact: this.estimateScoreImpact(issue.severity),
-        description: issue.impact,
-      },
-      affectedDimensions: [this.inferAffectedDimension(issue)],
-      rootCause: issue.description,
-      solution: issue.solution,
-      estimatedEffort: this.estimateEffort(issue.solution),
-      priority: this.calculatePriority(
-        this.normalizeSeverity(issue.severity),
-        this.estimateScoreImpact(issue.severity),
-      ),
-    }));
+    const issues: IdentifiedIssue[] = [];
+    
+    for (const issue of (result.issues || [])) {
+      const title = issue.title || issue.description || '未知问题';
+      const severity = issue.severity || 'medium';
+      
+      issues.push({
+        id: issue.id || `issue_ai_${issues.length + 1}`,
+        category: this.categorizeIssue(title),
+        title: title,
+        description: issue.description || title,
+        severity: this.normalizeSeverity(severity),
+        impact: {
+          dimension: this.inferAffectedDimension(issue),
+          scoreImpact: this.estimateScoreImpact(severity),
+          description: issue.impact || '',
+        },
+        affectedDimensions: [this.inferAffectedDimension(issue)],
+        rootCause: issue.description || title,
+        solution: issue.solution || '建议优化以改善此问题',
+        estimatedEffort: this.estimateEffort(issue.solution || ''),
+        priority: this.calculatePriority(
+          this.normalizeSeverity(severity),
+          this.estimateScoreImpact(severity),
+        ),
+      });
+    }
+    
+    return issues;
   }
 
   /**
@@ -157,10 +159,10 @@ export class IssueIdentifierService {
    */
   private identifyDescribedIssues(result: AIAnalysisResult): IdentifiedIssue[] {
     const issues: IdentifiedIssue[] = [];
-    const seenTitles = new Set(result.issues.map((i) => i.title));
+    const seenTitles = new Set((result.issues || []).map((i: any) => i.title || ''));
 
     for (const dim of result.dimensionScores) {
-      for (const problem of dim.problems) {
+      for (const problem of (dim.problems || [])) {
         if (!seenTitles.has(problem)) {
           issues.push({
             id: `issue_described_${issues.length + 1}`,

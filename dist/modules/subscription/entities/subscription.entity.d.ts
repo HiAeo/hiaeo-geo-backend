@@ -7,6 +7,7 @@ export declare enum SubscriptionStatus {
 export declare class Subscription {
     id: string;
     userId: string;
+    organizationId: string;
     packageId: string;
     orderId: string;
     status: SubscriptionStatus;
@@ -14,6 +15,8 @@ export declare class Subscription {
     endDate: Date;
     diagnosisUsed: number;
     diagnosisLimit: number;
+    credits: number;
+    creditsLimit: number;
     autoRenew: boolean;
     createdAt: Date;
     updatedAt: Date;

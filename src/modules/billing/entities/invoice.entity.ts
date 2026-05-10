@@ -46,10 +46,10 @@ export class Invoice {
   @Column({ type: 'varchar', length: 50, unique: true })
   invoiceNo: string;  // 发票号
 
-  @Column({ type: 'enum', enum: InvoiceType })
+  @Column({ type: 'simple-enum', enum: InvoiceType })
   type: InvoiceType;
 
-  @Column({ type: 'enum', enum: InvoiceStatus, default: InvoiceStatus.PENDING })
+  @Column({ type: 'simple-enum', enum: InvoiceStatus, default: InvoiceStatus.PENDING })
   status: InvoiceStatus;
 
   @Column({ type: 'decimal', precision: 10, scale: 2 })
@@ -122,7 +122,7 @@ export class Invoice {
   email: string;  // 接收邮箱
 
   // 开票信息
-  @Column({ type: 'timestamp', nullable: true })
+  @Column({ type: 'datetime', nullable: true })
   issuedAt: Date;  // 开票时间
 
   @Column({ type: 'varchar', length: 100, nullable: true })

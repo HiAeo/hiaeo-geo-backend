@@ -5,28 +5,6 @@ import { PaymentService } from '../services/payment.service';
 import { CouponService } from '../services/coupon.service';
 import { PaymentMethod, OrderStatus } from '../entities/order.entity';
 
-class CreateOrderDto {
-  packageId?: string;
-  packageName: string;
-  amount: number;
-  originalAmount?: number;
-  discount?: number;
-  billingCycle?: string;
-  duration?: number;
-  remark?: string;
-  couponCode?: string;
-}
-
-class RefundOrderDto {
-  reason: string;
-}
-
-class ValidateCouponDto {
-  code: string;
-  orderAmount: number;
-  packageId?: string;
-}
-
 @ApiTags('订单管理')
 @Controller('orders')
 export class OrderController {
@@ -39,13 +17,13 @@ export class OrderController {
   @Get()
   @ApiOperation({ summary: '获取订单列表' })
   @ApiHeader({ name: 'x-user-id', description: '用户ID', required: true })
-  @ApiQuery({ name: 'status', required: false, enum: OrderStatus })
+  @ApiQuery({ name: 'status', required: false })
   @ApiQuery({ name: 'page', required: false })
   @ApiQuery({ name: 'limit', required: false })
   @ApiResponse({ status: 200, description: '返回订单列表' })
   async getOrders(
     @Headers('x-user-id') userId: string,
-    @Query('status') status?: OrderStatus,
+    @Query('status') status?: string,
     @Query('page') page?: string,
     @Query('limit') limit?: string,
   ) {
@@ -63,6 +41,20 @@ export class OrderController {
   @ApiResponse({ status: 200, description: '返回订单统计' })
   async getOrderStats(@Headers('x-user-id') userId: string) {
     return this.orderService.getOrderStats(userId);
+  }
+
+  @Get('stats/summary')
+  @ApiOperation({ summary: '获取订单统计摘要（兼容前端）' })
+  @ApiHeader({ name: 'x-user-id', description: '用户ID', required: true })
+  @ApiResponse({ status: 200, description: '返回订单统计摘要' })
+  async getOrderStatsSummary(@Headers('x-user-id') userId: string) {
+    const stats = await this.orderService.getOrderStats(userId);
+    return {
+      totalOrders: stats.totalOrders || 0,
+      totalSpent: stats.totalSpent || 0,
+      paidOrders: stats.paidOrders || 0,
+      pendingOrders: stats.pendingOrders || 0,
+    };
   }
 
   @Get('refunds')
@@ -98,22 +90,26 @@ export class OrderController {
   @ApiResponse({ status: 201, description: '订单创建成功' })
   async createOrder(
     @Headers('x-user-id') userId: string,
-    @Body() dto: CreateOrderDto,
+    @Body() body: any,
   ) {
     // 如果有优惠券，先验证并计算折扣
-    if (dto.couponCode) {
-      const couponResult = await this.couponService.validateCoupon(
-        dto.couponCode,
-        userId,
-        dto.amount,
-        dto.packageId,
-      );
-      if (couponResult.valid) {
-        dto.discount = couponResult.discount;
+    if (body.couponCode) {
+      try {
+        const couponResult = await this.couponService.validateCoupon(
+          body.couponCode,
+          userId,
+          body.amount,
+          body.packageId,
+        );
+        if (couponResult.valid) {
+          body.discount = couponResult.discount;
+        }
+      } catch (e) {
+        // 忽略优惠券验证错误
       }
     }
 
-    return this.orderService.createOrder(userId, dto);
+    return this.orderService.createOrder(userId, body);
   }
 
   @Put(':id/cancel')
@@ -135,9 +131,9 @@ export class OrderController {
   async refundOrder(
     @Headers('x-user-id') userId: string,
     @Param('id') id: string,
-    @Body() dto: RefundOrderDto,
+    @Body() body: any,
   ) {
-    return this.orderService.refundOrder(id, userId, dto.reason);
+    return this.orderService.refundOrder(id, userId, body.reason);
   }
 
   @Post(':id/pay')
@@ -147,14 +143,14 @@ export class OrderController {
   async payOrder(
     @Headers('x-user-id') userId: string,
     @Param('id') id: string,
-    @Body('paymentMethod') paymentMethod: PaymentMethod,
+    @Body('paymentMethod') paymentMethod: string,
   ) {
     // 创建支付记录
-    const payment = await this.orderService.createPayment(id, paymentMethod);
+    const payment = await this.orderService.createPayment(id, paymentMethod as PaymentMethod);
 
     // 根据支付方式获取支付链接
     const order = await this.orderService.getOrderById(id, userId);
-    const notifyUrl = `${process.env.API_BASE_URL || 'http://localhost:3000'}/api/v1/orders/callback/${paymentMethod.toLowerCase()}`;
+    const notifyUrl = `${process.env.API_BASE_URL || 'http://localhost:3000'}/api/orders/callback/${(paymentMethod || '').toLowerCase()}`;
 
     if (paymentMethod === PaymentMethod.ALIPAY) {
       const result = await this.paymentService.alipayUnifiedOrder({
@@ -186,9 +182,9 @@ export class OrderController {
   @ApiResponse({ status: 200, description: '返回验证结果' })
   async validateCoupon(
     @Headers('x-user-id') userId: string,
-    @Body() dto: ValidateCouponDto,
+    @Body() body: any,
   ) {
-    return this.couponService.validateCoupon(dto.code, userId, dto.orderAmount, dto.packageId);
+    return this.couponService.validateCoupon(body.code, userId, body.orderAmount, body.packageId);
   }
 
   @Post('callback/alipay')
@@ -197,15 +193,19 @@ export class OrderController {
   async alipayCallback(@Body() params: any) {
     const verified = this.paymentService.verifyAlipayNotify(params);
     if (verified) {
-      await this.orderService.completeOrder(params.out_trade_no, {
-        orderId: params.out_trade_no,
-        paymentNo: params.trade_no,
-        status: params.trade_status,
-        transactionId: params.trade_no,
-        paidAmount: params.total_amount,
-        paidAt: params.gmt_payment,
-        channelResponse: params,
-      });
+      // 支付宝回调的 out_trade_no 是支付记录号，需要查找对应的订单
+      const payment = await this.orderService.getPaymentByPaymentNo(params.out_trade_no);
+      if (payment) {
+        await this.orderService.completeOrder(payment.orderId, {
+          orderId: payment.orderId,
+          paymentNo: params.trade_no,
+          status: params.trade_status,
+          transactionId: params.trade_no,
+          paidAmount: params.total_amount,
+          paidAt: params.gmt_payment,
+          channelResponse: params,
+        });
+      }
     }
     return { success: verified };
   }
@@ -216,15 +216,19 @@ export class OrderController {
   async wechatCallback(@Body() params: any) {
     const verified = this.paymentService.verifyWechatNotify(params);
     if (verified) {
-      await this.orderService.completeOrder(params.out_trade_no, {
-        orderId: params.out_trade_no,
-        paymentNo: params.transaction_id,
-        status: params.result_code,
-        transactionId: params.transaction_id,
-        paidAmount: params.total_fee / 100,
-        paidAt: params.time_end,
-        channelResponse: params,
-      });
+      // 微信回调的 out_trade_no 是支付记录号，需要查找对应的订单
+      const payment = await this.orderService.getPaymentByPaymentNo(params.out_trade_no);
+      if (payment) {
+        await this.orderService.completeOrder(payment.orderId, {
+          orderId: payment.orderId,
+          paymentNo: params.transaction_id,
+          status: params.result_code,
+          transactionId: params.transaction_id,
+          paidAmount: params.total_fee / 100,
+          paidAt: params.time_end,
+          channelResponse: params,
+        });
+      }
     }
     return { success: verified };
   }
@@ -243,7 +247,7 @@ export class OrderController {
   @ApiResponse({ status: 200, description: '返回支付状态' })
   async queryPaymentStatus(
     @Param('id') id: string,
-    @Query('paymentMethod') paymentMethod: PaymentMethod,
+    @Query('paymentMethod') paymentMethod: string,
   ) {
     const order = await this.orderService.getOrderById(id, 'system');
 

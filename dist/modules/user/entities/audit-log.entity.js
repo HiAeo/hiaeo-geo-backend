@@ -89,7 +89,7 @@ __decorate([
     __metadata("design:type", Boolean)
 ], AuditLog.prototype, "isSensitive", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ type: 'enum', enum: ['success', 'failure'], default: 'success' }),
+    (0, typeorm_1.Column)({ type: 'simple-enum', enum: ['success', 'failure'], default: 'success' }),
     __metadata("design:type", String)
 ], AuditLog.prototype, "result", void 0);
 __decorate([

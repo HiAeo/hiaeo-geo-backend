@@ -53,11 +53,11 @@ __decorate([
     __metadata("design:type", String)
 ], Organization.prototype, "shortName", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ type: 'enum', enum: OrganizationType, default: OrganizationType.INDIVIDUAL }),
+    (0, typeorm_1.Column)({ type: 'simple-enum', enum: OrganizationType, default: OrganizationType.INDIVIDUAL }),
     __metadata("design:type", String)
 ], Organization.prototype, "type", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ type: 'enum', enum: OrganizationTier, default: OrganizationTier.FREE }),
+    (0, typeorm_1.Column)({ type: 'simple-enum', enum: OrganizationTier, default: OrganizationTier.FREE }),
     __metadata("design:type", String)
 ], Organization.prototype, "tier", void 0);
 __decorate([
@@ -101,11 +101,11 @@ __decorate([
     __metadata("design:type", Object)
 ], Organization.prototype, "settings", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ type: 'timestamp', nullable: true }),
+    (0, typeorm_1.Column)({ type: 'datetime', nullable: true }),
     __metadata("design:type", Date)
 ], Organization.prototype, "trialEndsAt", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ type: 'timestamp', nullable: true }),
+    (0, typeorm_1.Column)({ type: 'datetime', nullable: true }),
     __metadata("design:type", Date)
 ], Organization.prototype, "subscriptionEndsAt", void 0);
 __decorate([

@@ -170,27 +170,226 @@ export class DiagnosisExecutorService {
 
   private async executeAIDiagnosis(
     task: DiagnosisTask,
-  ): Promise<{ result: any; enginesUsed: string[] }> {
-    const engineType = task.aiEngine;
+  ): Promise<{ result: any; enginesUsed: string[]; convertedResult?: any }> {
+    const engineType = task.aiEngine || 'deepseek';
     const enginesUsed: string[] = [];
 
-    const diagnosisParams = {
-      brandName: task.brandName,
-      productDescription: task.industry,
-      competitors: task.config?.competitors || [],
-    };
-
     let result;
-    if (engineType) {
-      result = await this.engineManager.diagnoseBrand(diagnosisParams, engineType);
-      enginesUsed.push(engineType);
-    } else {
-      const batchResult = await this.engineManager.batchDiagnose(diagnosisParams);
-      result = batchResult;
-      enginesUsed.push(batchResult.engine);
+    let seoDiagnosis = null;
+
+    // 如果有目标网站URL，优先进行SEO诊断
+    if (task.website) {
+      this.logger.log(`执行SEO诊断 - 目标网站: ${task.website}`);
+      
+      try {
+        const seoParams = {
+          targetUrl: task.website,
+          targetName: task.brandName,
+          targetIndustry: task.industry,
+          keywords: task.config?.keywords || [],
+        };
+        
+        // 尝试使用SEO诊断方法
+        seoDiagnosis = await this.engineManager.diagnoseSEO(seoParams, engineType);
+        this.logger.log(`SEO诊断完成 - 评分: ${seoDiagnosis.seoScore.overall}`);
+        enginesUsed.push(engineType);
+      } catch (error) {
+        this.logger.warn(`SEO诊断失败，使用品牌诊断: ${error.message}`);
+        seoDiagnosis = null;
+      }
     }
 
-    return { result, enginesUsed };
+    // 如果SEO诊断成功，使用SEO诊断结果
+    if (seoDiagnosis) {
+      result = seoDiagnosis;
+    } else {
+      // 否则使用品牌诊断
+      const diagnosisParams = {
+        brandName: task.brandName,
+        productDescription: task.industry,
+        competitors: task.config?.competitors || [],
+      };
+
+      if (engineType) {
+        result = await this.engineManager.diagnoseBrand(diagnosisParams, engineType);
+        enginesUsed.push(engineType);
+      } else {
+        const batchResult = await this.engineManager.batchDiagnose(diagnosisParams);
+        result = batchResult;
+        enginesUsed.push(batchResult.engine);
+      }
+    }
+
+    // 转换 AI 诊断结果为 HealthScoreCalculator 期望的格式
+    const convertedResult = this.convertToHealthScoreInput(result, task.brandName, seoDiagnosis !== null);
+
+    return { result, enginesUsed, convertedResult };
+  }
+
+  /**
+   * 将 AI 诊断结果转换为 HealthScoreCalculator 期望的格式
+   * @param isSEODiagnosis 是否为SEO诊断结果
+   */
+  private convertToHealthScoreInput(result: any, brandName: string, isSEODiagnosis: boolean = false): any {
+    // SEO诊断结果处理
+    if (isSEODiagnosis && result.seoScore) {
+      const issues: Array<{
+        id: string;
+        category: string;
+        title: string;
+        description: string;
+        severity: 'critical' | 'high' | 'medium' | 'low';
+        priority: number;
+        solution: string;
+        estimatedEffort: 'low' | 'medium' | 'high';
+        impact: { scoreImpact: number };
+        affectedDimensions: string[];
+      }> = (result.issues || []).map((issue: any, i: number) => ({
+        id: `issue_${i + 1}`,
+        category: issue.category || 'general',
+        title: issue.title,
+        description: issue.description,
+        severity: this.mapSeverity(issue.severity),
+        priority: this.calculatePriority(issue.severity, i),
+        solution: issue.recommendation,
+        estimatedEffort: 'medium',
+        impact: { scoreImpact: issue.severity === 'high' ? 8 : issue.severity === 'medium' ? 5 : 3 },
+        affectedDimensions: this.getAffectedDimensions(issue.category),
+      }));
+
+      return {
+        diagnosisId: `diag_${Date.now()}`,
+        brandName: brandName,
+        overallScore: 0,
+        dimensionScores: [
+          { 
+            name: '技术SEO基础', 
+            score: result.seoScore.technical || 60, 
+            analysis: `技术评分: ${result.seoScore.technical}`, 
+            problems: issues.filter(i => i.category === 'technical').map(i => i.title)
+          },
+          { 
+            name: '内容质量与相关性', 
+            score: result.seoScore.content || 60, 
+            analysis: `内容评分: ${result.seoScore.content}`, 
+            problems: issues.filter(i => i.category === 'content').map(i => i.title)
+          },
+          { 
+            name: '外部链接与权威性', 
+            score: result.seoScore.authority || 60, 
+            analysis: `权威性评分: ${result.seoScore.authority}`, 
+            problems: []
+          },
+          { 
+            name: '用户体验', 
+            score: result.seoScore.performance || 70, 
+            analysis: `性能评分: ${result.seoScore.performance}`, 
+            problems: []
+          },
+          { 
+            name: '地理定位优化', 
+            score: result.aiSearchPresence?.score || 50, 
+            analysis: result.summary || '', 
+            problems: []
+          },
+        ],
+        suggestions: result.issues?.map((i: any) => i.recommendation) || [],
+        issues: issues,
+        summary: {
+          total: issues.length,
+          critical: issues.filter((i: any) => i.severity === 'critical').length,
+          high: issues.filter((i: any) => i.severity === 'high').length,
+          medium: issues.filter((i: any) => i.severity === 'medium').length,
+          low: issues.filter((i: any) => i.severity === 'low').length,
+        },
+        aiSearchPresence: result.aiSearchPresence,
+      };
+    }
+
+    // 品牌诊断结果处理（原有逻辑）
+    const advantagesCount = result.competitiveAdvantages?.length || 0;
+    const issuesCount = result.potentialIssues?.length || 0;
+    const opportunitiesCount = result.marketOpportunities?.length || 0;
+    const suggestionsCount = result.contentSuggestions?.length || 0;
+    const confidence = result.confidence || 0.8;
+
+    // 基于 AI 分析结果推算各维度分数
+    const seoScore = Math.min(100, 50 + advantagesCount * 5 + suggestionsCount * 3);
+    const contentScore = Math.min(100, 45 + suggestionsCount * 8);
+    const linkScore = Math.min(100, 40 + confidence * 30);
+    const uxScore = Math.min(100, 55 + opportunitiesCount * 5);
+    const geoScore = Math.min(100, 50 + opportunitiesCount * 6 - issuesCount * 3);
+
+    const issues: Array<{
+      id: string;
+      category: string;
+      title: string;
+      description: string;
+      severity: 'critical' | 'high' | 'medium' | 'low';
+      priority: number;
+      solution: string;
+      estimatedEffort: 'low' | 'medium' | 'high';
+      impact: { scoreImpact: number };
+      affectedDimensions: string[];
+    }> = (result.potentialIssues || []).map((issue: string, i: number) => ({
+      id: `issue_${i + 1}`,
+      category: 'general',
+      title: issue,
+      description: issue,
+      severity: i < 2 ? 'high' : 'medium',
+      priority: i < 3 ? 30 - i * 5 : 15,
+      solution: `建议优化: ${issue}`,
+      estimatedEffort: 'medium',
+      impact: { scoreImpact: 5 },
+      affectedDimensions: ['技术SEO基础'],
+    }));
+
+    return {
+      diagnosisId: result.diagnosisId || `diag_${Date.now()}`,
+      brandName: brandName,
+      overallScore: 0, // 将由 HealthScoreCalculator 计算
+      dimensionScores: [
+        { name: '技术SEO基础', score: seoScore, analysis: result.brandPositioning || '', problems: [] },
+        { name: '内容质量与相关性', score: contentScore, analysis: `内容建议: ${(result.contentSuggestions || []).slice(0, 2).join('; ')}`, problems: [] },
+        { name: '外部链接与权威性', score: linkScore, analysis: `置信度: ${(confidence * 100).toFixed(0)}%`, problems: [] },
+        { name: '用户体验', score: uxScore, analysis: `市场机会: ${(result.marketOpportunities || []).slice(0, 2).join('; ')}`, problems: [] },
+        { name: '地理定位优化', score: geoScore, analysis: `机会与挑战并存`, problems: [] },
+      ],
+      suggestions: result.contentSuggestions || [],
+      issues: issues,
+      summary: {
+        total: issues.length,
+        critical: issues.filter((i: any) => i.severity === 'critical').length,
+        high: issues.filter((i: any) => i.severity === 'high').length,
+        medium: issues.filter((i: any) => i.severity === 'medium').length,
+        low: issues.filter((i: any) => i.severity === 'low').length,
+      },
+    };
+  }
+
+  private mapSeverity(severity: string): 'critical' | 'high' | 'medium' | 'low' {
+    switch (severity) {
+      case 'high': return 'high';
+      case 'medium': return 'medium';
+      case 'low': return 'low';
+      default: return 'medium';
+    }
+  }
+
+  private calculatePriority(severity: string, index: number): number {
+    if (severity === 'high') return 30 - index * 3;
+    if (severity === 'medium') return 20 - index * 2;
+    return 10;
+  }
+
+  private getAffectedDimensions(category: string): string[] {
+    switch (category) {
+      case 'technical': return ['技术SEO基础'];
+      case 'content': return ['内容质量与相关性'];
+      case 'authority': return ['外部链接与权威性'];
+      case 'performance': return ['用户体验'];
+      default: return ['技术SEO基础'];
+    }
   }
 
   private async executeHealthScoreCalculation(
@@ -201,8 +400,9 @@ export class DiagnosisExecutorService {
       throw new Error('AI诊断未完成，无法计算健康分');
     }
 
+    // 使用转换后的结果（符合 HealthScoreCalculator 期望的格式）
     return this.healthScoreCalculator.calculate(
-      aiStep.data.result,
+      aiStep.data.convertedResult,
       task.config?.dimensions,
     );
   }
@@ -227,8 +427,9 @@ export class DiagnosisExecutorService {
       throw new Error('AI诊断未完成，无法识别问题');
     }
 
+    // 使用转换后的结果
     return this.issueIdentifier.identify(
-      aiStep.data.result,
+      aiStep.data.convertedResult,
       aiStep.data.enginesUsed,
     );
   }
@@ -239,38 +440,49 @@ export class DiagnosisExecutorService {
     competitorAnalysis: CompetitorAnalysisResult | null,
     issueStep: any,
   ): Promise<{ reportId: string } & ReportGenerationResult> {
-    const healthScore = healthScoreStep.data as HealthScoreResult;
-    const issues = issueStep.data as IssueAnalysisResult;
+    try {
+      const healthScore = healthScoreStep.data as HealthScoreResult;
+      const issues = issueStep.data as IssueAnalysisResult;
 
-    const reportResult = await this.reportGenerator.generate(
-      task,
-      healthScore,
-      competitorAnalysis,
-      issues,
-    );
+      this.logger.log(`开始生成报告 - taskId: ${task.id}, healthScore: ${JSON.stringify(healthScore.overallScore)}`);
 
-    const report = await this.taskService.saveReport({
-      taskId: task.id,
-      userId: task.userId,
-      brandName: task.brandName,
-      overallScore: healthScore.overallScore,
-      grade: healthScore.grade as unknown as ReportGrade,
-      healthLevel: healthScore.healthLevel,
-      dimensionScores: healthScore.dimensionScores,
-      competitorAnalysis: competitorAnalysis as any,
-      issues: issues.issues,
-      suggestions: this.generateSuggestionsFromIssues(issues),
-      executiveSummary: reportResult.executiveSummary,
-      aiInsights: reportResult.aiInsights,
-      enginesUsed: [],
-    });
+      const reportResult = await this.reportGenerator.generate(
+        task,
+        healthScore,
+        competitorAnalysis,
+        issues,
+      );
 
-    await this.taskService.linkReport(task.id, report.id);
+      this.logger.log(`报告内容生成完成，准备保存报告`);
 
-    return {
-      ...reportResult,
-      reportId: report.id,
-    };
+      const report = await this.taskService.saveReport({
+        taskId: task.id,
+        userId: task.userId,
+        brandName: task.brandName,
+        overallScore: healthScore.overallScore,
+        grade: healthScore.grade as unknown as ReportGrade,
+        healthLevel: healthScore.healthLevel,
+        dimensionScores: healthScore.dimensionScores,
+        competitorAnalysis: competitorAnalysis as any,
+        issues: issues.issues,
+        suggestions: this.generateSuggestionsFromIssues(issues),
+        executiveSummary: reportResult.executiveSummary,
+        aiInsights: reportResult.aiInsights,
+        enginesUsed: [],
+      });
+
+      this.logger.log(`报告保存成功 - reportId: ${report.id}`);
+
+      await this.taskService.linkReport(task.id, report.id);
+
+      return {
+        ...reportResult,
+        reportId: report.id,
+      };
+    } catch (error) {
+      this.logger.error(`报告生成失败 - taskId: ${task.id}, error: ${error.message}`, error.stack);
+      throw error;
+    }
   }
 
   private generateSuggestionsFromIssues(issues: IssueAnalysisResult): any[] {

@@ -18,13 +18,108 @@ const swagger_1 = require("@nestjs/swagger");
 const content_service_1 = require("../services/content.service");
 const content_audit_service_1 = require("../services/content-audit.service");
 const content_generator_service_1 = require("../services/content-generator.service");
+const knowledge_aware_content_service_1 = require("../services/knowledge-aware-content.service");
 const content_generation_dto_1 = require("../dto/content-generation.dto");
 const jwt_auth_guard_1 = require("../../auth/guards/jwt-auth.guard");
 let ContentController = class ContentController {
-    constructor(contentService, auditService, generatorService) {
+    constructor(contentService, auditService, generatorService, knowledgeAwareContentService) {
         this.contentService = contentService;
         this.auditService = auditService;
         this.generatorService = generatorService;
+        this.knowledgeAwareContentService = knowledgeAwareContentService;
+    }
+    async generateSeoArticleFromKnowledge(req, body) {
+        const organizationId = req.user?.organizationId;
+        if (!organizationId) {
+            return { success: false, message: '未找到组织信息' };
+        }
+        const context = await this.knowledgeAwareContentService.buildSeoArticleContext(organizationId, body.keyword);
+        if (!context) {
+            return {
+                success: false,
+                message: '知识库信息不完整，请先完善品牌知识库',
+            };
+        }
+        const result = await this.generatorService.generateSeoArticle(context);
+        const checkResult = await this.knowledgeAwareContentService.checkContentAgainstKnowledge(organizationId, result.content);
+        return {
+            success: true,
+            data: result,
+            warnings: checkResult.hasViolation ? checkResult.foundWords : [],
+            context: {
+                brandName: context.brandName,
+                keyword: context.keyword,
+            },
+        };
+    }
+    async generateFaqFromKnowledge(req, body) {
+        const organizationId = req.user?.organizationId;
+        if (!organizationId) {
+            return { success: false, message: '未找到组织信息' };
+        }
+        const context = await this.knowledgeAwareContentService.buildFaqContext(organizationId, body.faqType || 'brand');
+        if (!context) {
+            return {
+                success: false,
+                message: '知识库信息不完整，请先完善品牌知识库',
+            };
+        }
+        const result = await this.generatorService.generateFaq(context);
+        return {
+            success: true,
+            data: result,
+            context: {
+                brandName: context.name,
+                faqType: context.faqType,
+            },
+        };
+    }
+    async generateProductDescriptionFromKnowledge(req, body) {
+        const organizationId = req.user?.organizationId;
+        if (!organizationId) {
+            return { success: false, message: '未找到组织信息' };
+        }
+        const context = await this.knowledgeAwareContentService.buildProductDescriptionContext(organizationId, body.productName);
+        if (!context) {
+            return {
+                success: false,
+                message: '知识库缺少产品信息，请先完善产品服务详情',
+            };
+        }
+        const result = await this.generatorService.generateProductDescription(context);
+        return {
+            success: true,
+            data: result,
+            context: {
+                productName: context.productName,
+                brandName: context.brandName,
+            },
+        };
+    }
+    async checkWithKnowledge(req, body) {
+        const organizationId = req.user?.organizationId;
+        if (!organizationId) {
+            return { success: false, message: '未找到组织信息' };
+        }
+        const result = await this.knowledgeAwareContentService.checkContentAgainstKnowledge(organizationId, body.content);
+        return {
+            success: true,
+            ...result,
+        };
+    }
+    async getBrandSummary(req) {
+        const organizationId = req.user?.organizationId;
+        if (!organizationId) {
+            return { success: false, message: '未找到组织信息' };
+        }
+        const summary = await this.knowledgeAwareContentService.getBrandSummary(organizationId);
+        if (!summary) {
+            return { success: false, message: '未找到知识库' };
+        }
+        return {
+            success: true,
+            data: summary,
+        };
     }
     async create(createContentDto, req) {
         const content = await this.contentService.create(createContentDto, req.user?.id || 'system');
@@ -68,6 +163,50 @@ let ContentController = class ContentController {
     }
 };
 exports.ContentController = ContentController;
+__decorate([
+    (0, common_1.Post)('generate/seo-article/from-knowledge'),
+    (0, swagger_1.ApiOperation)({ summary: '基于知识库生成SEO文章' }),
+    __param(0, (0, common_1.Request)()),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, Object]),
+    __metadata("design:returntype", Promise)
+], ContentController.prototype, "generateSeoArticleFromKnowledge", null);
+__decorate([
+    (0, common_1.Post)('generate/faq/from-knowledge'),
+    (0, swagger_1.ApiOperation)({ summary: '基于知识库生成FAQ问答' }),
+    __param(0, (0, common_1.Request)()),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, Object]),
+    __metadata("design:returntype", Promise)
+], ContentController.prototype, "generateFaqFromKnowledge", null);
+__decorate([
+    (0, common_1.Post)('generate/product-description/from-knowledge'),
+    (0, swagger_1.ApiOperation)({ summary: '基于知识库生成产品描述' }),
+    __param(0, (0, common_1.Request)()),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, Object]),
+    __metadata("design:returntype", Promise)
+], ContentController.prototype, "generateProductDescriptionFromKnowledge", null);
+__decorate([
+    (0, common_1.Post)('check-with-knowledge'),
+    (0, swagger_1.ApiOperation)({ summary: '检查内容与知识库合规性' }),
+    __param(0, (0, common_1.Request)()),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, Object]),
+    __metadata("design:returntype", Promise)
+], ContentController.prototype, "checkWithKnowledge", null);
+__decorate([
+    (0, common_1.Get)('brand-summary'),
+    (0, swagger_1.ApiOperation)({ summary: '获取品牌摘要用于内容生成' }),
+    __param(0, (0, common_1.Request)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], ContentController.prototype, "getBrandSummary", null);
 __decorate([
     (0, common_1.Post)(),
     (0, swagger_1.ApiOperation)({ summary: '创建内容' }),
@@ -167,6 +306,7 @@ exports.ContentController = ContentController = __decorate([
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
     __metadata("design:paramtypes", [content_service_1.ContentService,
         content_audit_service_1.ContentAuditService,
-        content_generator_service_1.ContentGeneratorService])
+        content_generator_service_1.ContentGeneratorService,
+        knowledge_aware_content_service_1.KnowledgeAwareContentService])
 ], ContentController);
 //# sourceMappingURL=content.controller.js.map

@@ -5,6 +5,7 @@ import { Refund } from '../entities/payment.entity';
 import { PackageService } from '../../package/services/package.service';
 import { SubscriptionService } from '../../subscription/services/subscription.service';
 import { CreditService } from '../../subscription/services/credit.service';
+import { InvitationService } from '../../invitation/services/invitation.service';
 export interface CreateOrderDto {
     packageId?: string;
     packageName: string;
@@ -40,8 +41,9 @@ export declare class OrderService {
     private packageService;
     private subscriptionService;
     private creditService;
+    private invitationService;
     private dataSource;
-    constructor(orderRepository: Repository<Order>, paymentRepository: Repository<Payment>, refundRepository: Repository<Refund>, packageService: PackageService, subscriptionService: SubscriptionService, creditService: CreditService, dataSource: DataSource);
+    constructor(orderRepository: Repository<Order>, paymentRepository: Repository<Payment>, refundRepository: Repository<Refund>, packageService: PackageService, subscriptionService: SubscriptionService, creditService: CreditService, invitationService: InvitationService, dataSource: DataSource);
     createOrder(userId: string, dto: CreateOrderDto): Promise<Order>;
     getOrders(filter: OrderFilter): Promise<{
         orders: Order[];
@@ -60,8 +62,8 @@ export declare class OrderService {
         amount: number;
         originalAmount: number;
         discount: number;
-        status: OrderStatus;
-        paymentMethod: PaymentMethod;
+        status: string;
+        paymentMethod: string;
         paymentTime: Date;
         transactionId: string;
         remark: string;
@@ -77,6 +79,7 @@ export declare class OrderService {
     cancelOrder(orderId: string, userId: string, reason?: string): Promise<Order | null>;
     createPayment(orderId: string, paymentMethod: PaymentMethod): Promise<Payment>;
     getPaymentInfo(paymentId: string): Promise<Payment>;
+    getPaymentByPaymentNo(paymentNo: string): Promise<Payment | null>;
     completeOrder(orderId: string, callback: PaymentCallback): Promise<{
         orderId: string;
         status: string;

@@ -28,6 +28,10 @@ export declare class DiagnosisExecutorService {
     execute(taskId: string): Promise<DiagnosisExecutionResult>;
     private executeWithTiming;
     private executeAIDiagnosis;
+    private convertToHealthScoreInput;
+    private mapSeverity;
+    private calculatePriority;
+    private getAffectedDimensions;
     private executeHealthScoreCalculation;
     private executeCompetitorAnalysis;
     private executeIssueIdentification;

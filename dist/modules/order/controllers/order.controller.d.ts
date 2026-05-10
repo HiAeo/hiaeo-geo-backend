@@ -1,32 +1,12 @@
 import { OrderService } from '../services/order.service';
 import { PaymentService } from '../services/payment.service';
 import { CouponService } from '../services/coupon.service';
-import { PaymentMethod, OrderStatus } from '../entities/order.entity';
-declare class CreateOrderDto {
-    packageId?: string;
-    packageName: string;
-    amount: number;
-    originalAmount?: number;
-    discount?: number;
-    billingCycle?: string;
-    duration?: number;
-    remark?: string;
-    couponCode?: string;
-}
-declare class RefundOrderDto {
-    reason: string;
-}
-declare class ValidateCouponDto {
-    code: string;
-    orderAmount: number;
-    packageId?: string;
-}
 export declare class OrderController {
     private readonly orderService;
     private readonly paymentService;
     private readonly couponService;
     constructor(orderService: OrderService, paymentService: PaymentService, couponService: CouponService);
-    getOrders(userId: string, status?: OrderStatus, page?: string, limit?: string): Promise<{
+    getOrders(userId: string, status?: string, page?: string, limit?: string): Promise<{
         orders: import("../entities/order.entity").Order[];
         total: number;
         page: number;
@@ -38,6 +18,12 @@ export declare class OrderController {
         paidOrders: number;
         pendingOrders: number;
         totalSpent: number;
+    }>;
+    getOrderStatsSummary(userId: string): Promise<{
+        totalOrders: number;
+        totalSpent: number;
+        paidOrders: number;
+        pendingOrders: number;
     }>;
     getRefunds(userId: string): Promise<import("../entities/payment.entity").Refund[]>;
     getUserCoupons(userId: string): Promise<{
@@ -60,23 +46,23 @@ export declare class OrderController {
         amount: number;
         originalAmount: number;
         discount: number;
-        status: OrderStatus;
-        paymentMethod: PaymentMethod;
+        status: string;
+        paymentMethod: string;
         paymentTime: Date;
         transactionId: string;
         remark: string;
         createdAt: Date;
         updatedAt: Date;
     }>;
-    createOrder(userId: string, dto: CreateOrderDto): Promise<import("../entities/order.entity").Order>;
+    createOrder(userId: string, body: any): Promise<import("../entities/order.entity").Order>;
     cancelOrder(userId: string, id: string, reason?: string): Promise<import("../entities/order.entity").Order | null>;
-    refundOrder(userId: string, id: string, dto: RefundOrderDto): Promise<{
+    refundOrder(userId: string, id: string, body: any): Promise<{
         refundNo: string;
         refundAmount: number;
         status: string;
         message: string;
     }>;
-    payOrder(userId: string, id: string, paymentMethod: PaymentMethod): Promise<{
+    payOrder(userId: string, id: string, paymentMethod: string): Promise<{
         success: boolean;
         paymentUrl?: string;
         qrCode?: string;
@@ -85,7 +71,7 @@ export declare class OrderController {
         errorMessage?: string;
         payment: import("../entities/payment.entity").Payment;
     }>;
-    validateCoupon(userId: string, dto: ValidateCouponDto): Promise<import("../services/coupon.service").ValidateCouponResult>;
+    validateCoupon(userId: string, body: any): Promise<import("../services/coupon.service").ValidateCouponResult>;
     alipayCallback(params: any): Promise<{
         success: boolean;
     }>;
@@ -93,7 +79,7 @@ export declare class OrderController {
         success: boolean;
     }>;
     getPaymentInfo(paymentId: string): Promise<import("../entities/payment.entity").Payment>;
-    queryPaymentStatus(id: string, paymentMethod: PaymentMethod): Promise<{
+    queryPaymentStatus(id: string, paymentMethod: string): Promise<{
         success: boolean;
         tradeStatus: string;
     } | {
@@ -104,4 +90,3 @@ export declare class OrderController {
         errorMessage: string;
     }>;
 }
-export {};

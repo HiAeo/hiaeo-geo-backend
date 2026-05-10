@@ -17,4 +17,5 @@ Object.defineProperty(exports, "__esModule", { value: true });
 __exportStar(require("./content.service"), exports);
 __exportStar(require("./content-generator.service"), exports);
 __exportStar(require("./content-audit.service"), exports);
+__exportStar(require("./knowledge-aware-content.service"), exports);
 //# sourceMappingURL=index.js.map

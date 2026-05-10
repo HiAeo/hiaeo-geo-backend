@@ -27,7 +27,7 @@ export declare class PaymentService {
     constructor(configService: ConfigService);
     alipayUnifiedOrder(params: UnifiedOrderParams): Promise<UnifiedOrderResult>;
     wechatUnifiedOrder(params: UnifiedOrderParams): Promise<UnifiedOrderResult>;
-    verifyAlipayNotify(params: PayNotifyParams): boolean;
+    verifyAlipayNotify(params: any): boolean;
     verifyWechatNotify(params: any): boolean;
     alipayRefund(outTradeNo: string, refundAmount: number, refundReason: string): Promise<{
         success: boolean;

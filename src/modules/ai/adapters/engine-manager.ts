@@ -5,7 +5,7 @@ import { QwenAdapter } from './qwen.adapter';
 import { ZhipuAdapter } from './zhipu.adapter';
 import { DoubaoAdapter } from './doubao.adapter';
 import { WenxinAdapter } from './wenxin.adapter';
-import { BrandDiagnosisParams, BrandDiagnosisResult, ContentGenerationParams, ContentGenerationResult, ChatParams, ChatResult } from '../interfaces/ai-engine.interface';
+import { BrandDiagnosisParams, BrandDiagnosisResult, ContentGenerationParams, ContentGenerationResult, ChatParams, ChatResult, SEODiagnosisParams, SEODiagnosisResult } from '../interfaces/ai-engine.interface';
 
 export interface AggregatedDiagnosisResult {
   brandPositioning: string;
@@ -133,6 +133,32 @@ export class EngineManager {
       throw new Error(`Engine ${engine} not found`);
     }
     return adapter.chat(params);
+  }
+
+  async diagnoseSEO(params: SEODiagnosisParams, engine?: string): Promise<SEODiagnosisResult> {
+    const adapter = this.getEngine(engine);
+    if (!adapter) {
+      throw new Error(`Engine ${engine} not found`);
+    }
+    if (typeof adapter.diagnoseSEO === 'function') {
+      return adapter.diagnoseSEO(params);
+    }
+    // 如果引擎不支持SEO诊断，使用Mock数据
+    console.warn(`引擎 ${adapter.name} 不支持SEO诊断`);
+    return {
+      seoScore: { overall: 60, technical: 60, content: 60, authority: 60, performance: 60 },
+      issues: [],
+      aiSearchPresence: { score: 50, coverage: 50, mentions: 0, sentiment: 'neutral' },
+      summary: '当前引擎不支持SEO诊断'
+    };
+  }
+
+  getAllEngines(): Array<{ name: string; displayName: string; available: boolean }> {
+    return Array.from(this.engines.entries()).map(([key, adapter]) => ({
+      name: key,
+      displayName: adapter.name || key,
+      available: typeof adapter.isAvailable === 'function' ? adapter.isAvailable() : false
+    }));
   }
 
   async checkEnginesHealth(): Promise<EngineHealthStatus[]> {

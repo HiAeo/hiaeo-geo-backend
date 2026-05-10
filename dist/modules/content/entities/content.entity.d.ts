@@ -7,6 +7,12 @@ export declare class Content {
     tags: string;
     categoryId: number;
     userId: string;
+    organizationId: string;
+    brandId: string;
+    published: boolean;
+    platform: string;
+    aiEngine: string;
+    engagement: number;
     createdAt: Date;
     updatedAt: Date;
 }

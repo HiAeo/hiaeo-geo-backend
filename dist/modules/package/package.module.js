@@ -10,17 +10,21 @@ exports.PackageModule = void 0;
 const common_1 = require("@nestjs/common");
 const typeorm_1 = require("@nestjs/typeorm");
 const package_controller_1 = require("./controllers/package.controller");
+const package_admin_controller_1 = require("./controllers/package-admin.controller");
 const package_service_1 = require("./services/package.service");
+const package_admin_service_1 = require("./services/package-admin.service");
 const package_entity_1 = require("./entities/package.entity");
+const user_entity_1 = require("../user/entities/user.entity");
+const role_entity_1 = require("../user/entities/role.entity");
 let PackageModule = class PackageModule {
 };
 exports.PackageModule = PackageModule;
 exports.PackageModule = PackageModule = __decorate([
     (0, common_1.Module)({
-        imports: [typeorm_1.TypeOrmModule.forFeature([package_entity_1.Package])],
-        controllers: [package_controller_1.PackageController],
-        providers: [package_service_1.PackageService],
-        exports: [package_service_1.PackageService],
+        imports: [typeorm_1.TypeOrmModule.forFeature([package_entity_1.Package, user_entity_1.User, role_entity_1.Role])],
+        controllers: [package_controller_1.PackageController, package_admin_controller_1.PackageAdminController],
+        providers: [package_service_1.PackageService, package_admin_service_1.PackageAdminService],
+        exports: [package_service_1.PackageService, package_admin_service_1.PackageAdminService],
     })
 ], PackageModule);
 //# sourceMappingURL=package.module.js.map

@@ -11,6 +11,7 @@ export declare class DiagnosisController {
         data: DiagnosisTaskResponseDto;
         message: string;
     }>;
+    private runDiagnosisAsync;
     queryTasks(userId: string, query: QueryDiagnosisTaskDto): Promise<{
         success: boolean;
         data: {

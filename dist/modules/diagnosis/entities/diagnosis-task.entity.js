@@ -38,6 +38,14 @@ __decorate([
     __metadata("design:type", String)
 ], DiagnosisTask.prototype, "userId", void 0);
 __decorate([
+    (0, typeorm_1.Column)({ name: 'organization_id', nullable: true }),
+    __metadata("design:type", String)
+], DiagnosisTask.prototype, "organizationId", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ name: 'brand_id', nullable: true }),
+    __metadata("design:type", String)
+], DiagnosisTask.prototype, "brandId", void 0);
+__decorate([
     (0, typeorm_1.Column)({ name: 'brand_name' }),
     __metadata("design:type", String)
 ], DiagnosisTask.prototype, "brandName", void 0);
@@ -55,7 +63,7 @@ __decorate([
 ], DiagnosisTask.prototype, "targetMarket", void 0);
 __decorate([
     (0, typeorm_1.Column)({
-        type: 'enum',
+        type: 'simple-enum',
         enum: DiagnosisType,
         default: DiagnosisType.FULL,
     }),
@@ -63,7 +71,7 @@ __decorate([
 ], DiagnosisTask.prototype, "type", void 0);
 __decorate([
     (0, typeorm_1.Column)({
-        type: 'enum',
+        type: 'simple-enum',
         enum: DiagnosisStatus,
         default: DiagnosisStatus.PENDING,
     }),
@@ -78,7 +86,7 @@ __decorate([
     __metadata("design:type", Number)
 ], DiagnosisTask.prototype, "progress", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ type: 'jsonb', nullable: true }),
+    (0, typeorm_1.Column)({ type: 'json', nullable: true }),
     __metadata("design:type", Object)
 ], DiagnosisTask.prototype, "config", void 0);
 __decorate([

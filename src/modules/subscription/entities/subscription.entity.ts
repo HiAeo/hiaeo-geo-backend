@@ -15,6 +15,9 @@ export class Subscription {
   @Column({ name: 'user_id' })
   userId: string;
 
+  @Column({ name: 'organization_id', nullable: true })
+  organizationId: string;
+
   @Column({ name: 'package_id' })
   packageId: string;
 
@@ -22,7 +25,7 @@ export class Subscription {
   orderId: string;
 
   @Column({
-    type: 'enum',
+    type: 'simple-enum',
     enum: SubscriptionStatus,
     default: SubscriptionStatus.ACTIVE,
   })
@@ -39,6 +42,12 @@ export class Subscription {
 
   @Column({ name: 'diagnosis_limit', default: 10 })
   diagnosisLimit: number;
+
+  @Column({ name: 'credits', default: 0 })
+  credits: number;
+
+  @Column({ name: 'credits_limit', default: 0 })
+  creditsLimit: number;
 
   @Column({ name: 'auto_renew', default: true })
   autoRenew: boolean;

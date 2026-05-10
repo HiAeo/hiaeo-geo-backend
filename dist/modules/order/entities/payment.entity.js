@@ -37,7 +37,8 @@ __decorate([
 ], Payment.prototype, "paymentNo", void 0);
 __decorate([
     (0, typeorm_1.Column)({
-        type: 'enum',
+        name: 'status',
+        type: 'simple-enum',
         enum: PaymentStatus,
         default: PaymentStatus.PENDING,
     }),
@@ -72,11 +73,11 @@ __decorate([
     __metadata("design:type", Date)
 ], Payment.prototype, "expireAt", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ type: 'jsonb', nullable: true }),
+    (0, typeorm_1.Column)({ name: 'channel_response', type: 'json', nullable: true }),
     __metadata("design:type", Object)
 ], Payment.prototype, "channelResponse", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ type: 'jsonb', nullable: true }),
+    (0, typeorm_1.Column)({ type: 'json', nullable: true }),
     __metadata("design:type", Object)
 ], Payment.prototype, "metadata", void 0);
 __decorate([

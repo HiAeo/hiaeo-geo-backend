@@ -34,7 +34,6 @@ export enum ApiKeyScope {
  */
 @Entity('api_keys')
 @Index(['organizationId', 'status'])
-@Index(['key'])
 export class ApiKey {
   @PrimaryGeneratedColumn('uuid')
   id: string;
@@ -55,10 +54,10 @@ export class ApiKey {
   @Column({ type: 'varchar', length: 255, nullable: true })
   description: string;
 
-  @Column({ type: 'simple-array', nullable: true })
+  @Column({ type: 'json', nullable: true })
   scopes: ApiKeyScope[];  // 权限范围
 
-  @Column({ type: 'enum', enum: ApiKeyStatus, default: ApiKeyStatus.ACTIVE })
+  @Column({ type: 'simple-enum', enum: ApiKeyStatus, default: ApiKeyStatus.ACTIVE })
   status: ApiKeyStatus;
 
   @Column({ type: 'int', default: 0 })
@@ -70,10 +69,10 @@ export class ApiKey {
   @Column({ type: 'int', default: 0 })
   usedCount: number;  // 已使用次数
 
-  @Column({ type: 'timestamp', nullable: true })
+  @Column({ type: 'datetime', nullable: true })
   expiresAt: Date;  // 过期时间
 
-  @Column({ type: 'timestamp', nullable: true })
+  @Column({ type: 'datetime', nullable: true })
   lastUsedAt: Date;  // 最后使用时间
 
   @Column({ type: 'varchar', length: 50, nullable: true })

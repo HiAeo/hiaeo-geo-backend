@@ -8,16 +8,20 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.BrandModule = void 0;
 const common_1 = require("@nestjs/common");
+const typeorm_1 = require("@nestjs/typeorm");
 const brand_controller_1 = require("./controllers/brand.controller");
 const brand_service_1 = require("./services/brand.service");
+const brand_entity_1 = require("./entities/brand.entity");
+const organization_entity_1 = require("../user/entities/organization.entity");
 let BrandModule = class BrandModule {
 };
 exports.BrandModule = BrandModule;
 exports.BrandModule = BrandModule = __decorate([
     (0, common_1.Module)({
+        imports: [typeorm_1.TypeOrmModule.forFeature([brand_entity_1.Brand, organization_entity_1.Organization])],
         controllers: [brand_controller_1.BrandController],
         providers: [brand_service_1.BrandService],
-        exports: [brand_service_1.BrandService]
+        exports: [brand_service_1.BrandService],
     })
 ], BrandModule);
 //# sourceMappingURL=brand.module.js.map

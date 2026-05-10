@@ -1,0 +1,167 @@
+{
+  "title": "Brand Knowledge Base",
+  "subtitle": "Complete your brand information, and AI will generate more accurate diagnostic reports and optimization strategies for you",
+  "version": "Version",
+  "lastUpdate": "Last Updated",
+  "versionHistory": "Version History",
+  "saveKnowledge": "Save Knowledge Base",
+  "saving": "Saving...",
+  "progress": "{{completed}}/{{total}} modules completed",
+  "modules": {
+    "basicInfo": {
+      "title": "Basic Company Information",
+      "required": "*Required",
+      "companyName": "Company Full Name",
+      "companyShortName": "Brand Name / External Name",
+      "industry": "Industry & Niche Segment",
+      "companyRegion": "Headquarters Location",
+      "mainBizArea": "Main Promotion Area",
+      "bizModel": "Business Model",
+      "companyScale": "Company Size / Founded Year",
+      "website": "Company Website",
+      "socialMedia": "Social Media Accounts",
+      "contactName": "Contact Person Name",
+      "contactPhone": "Contact Phone",
+      "contactEmail": "Contact Email"
+    },
+    "bizPositioning": {
+      "title": "Core Business & Positioning",
+      "required": "*Required",
+      "coreBizIntro": "One-line Core Business Description",
+      "targetCustomer": "Target Customer Groups",
+      "customerPainPoint": "Core Customer Pain Points",
+      "differentialAdvantage": "Differential Advantages",
+      "forbiddenBiz": "Forbidden/Unacceptable Business, Prohibited Keywords"
+    },
+    "productService": {
+      "title": "Products & Services Details",
+      "required": "*Required",
+      "productServiceList": "Main Products/Services List",
+      "productName": "Product/Service Name",
+      "productDesc": "Description",
+      "productSellPoint": "Product Selling Points, Features, Application Scenarios",
+      "serviceDetails": "Service Scope, Delivery Cycle, Price Range/Packages",
+      "coreKeywords": "Core Keywords (Self-perceived)",
+      "addProduct": "Add Product"
+    },
+    "competitorMarket": {
+      "title": "Competitors & Market Information",
+      "optional": "Optional",
+      "competitors": "Direct Competitors (3-5)",
+      "competitorName": "Competitor Name",
+      "competitorWebsite": "Competitor Website URL",
+      "competitorAdvDisadv": "Competitor Strengths & Weaknesses",
+      "marketGap": "Market Gap / Unmet Needs",
+      "addCompetitor": "Add Competitor"
+    },
+    "geoGoals": {
+      "title": "GEO Promotion Goals",
+      "required": "*Required",
+      "promotionGoals": "Promotion Goals",
+      "keyPromotionArea": "Key Promotion Cities/Areas",
+      "forbiddenPromotionArea": "Forbidden Promotion Areas",
+      "keywordDirection": "Keyword Direction",
+      "budgetAndRhythm": "Budget & Launch Schedule",
+      "expectedEffect": "Expected Results"
+    },
+    "fileIndex": {
+      "title": "Document Upload Area",
+      "optional": "Optional",
+      "tip": "Upload brand-related materials, and AI will conduct in-depth analysis based on these materials. Supports PDF, Word, images, video formats, etc.",
+      "certFiles": "Company Certifications",
+      "certFilesDesc": "Business license, patents, certifications, etc.",
+      "productFiles": "Product Manuals",
+      "productFilesDesc": "Product specifications, selling points documents",
+      "serviceFiles": "Service Materials",
+      "serviceFilesDesc": "Quotations, package plans",
+      "caseFiles": "Case Materials",
+      "caseFilesDesc": "Project photos, case documents",
+      "fileRemark": "File Remarks"
+    },
+    "supplement": {
+      "title": "Supplementary Information & Special Requirements",
+      "optional": "Optional",
+      "brandForbiddenWords": "Brand Prohibited Words, Forbidden Copy",
+      "complianceRequirements": "Regional Compliance, Industry-specific Requirements",
+      "previousPromotion": "Previous Promotion Experience",
+      "specialRequirements": "Other Special Requirements",
+      "versionRemark": "Version Remarks"
+    }
+  },
+  "bizModels": {
+    "B2B": "B2B",
+    "B2C": "B2C",
+    "localService": "Local Services",
+    "franchise": "Franchise"
+  },
+  "promotionGoals": {
+    "leads": "Leads",
+    "exposure": "Exposure",
+    "inquiry": "Inquiry",
+    "franchise": "Franchise",
+    "recruit": "Recruit"
+  },
+  "keywordDirections": {
+    "local": "Local Keywords",
+    "regional": "Regional Keywords",
+    "longTail": "Long-tail Keywords"
+  },
+  "ai": {
+    "aiSuggest": "AI Auto-fill",
+    "analyzing": "Analyzing...",
+    "suggestionGenerated": "AI suggestion generated",
+    "suggestionFailed": "Failed to get AI suggestion",
+    "fillFromUrl": "Extract from URL",
+    "urlRequired": "Please enter the website address first"
+  },
+  "fileUpload": {
+    "clickOrDrag": "Click or drag to upload",
+    "remove": "Remove"
+  },
+  "history": {
+    "noRecords": "No version records",
+    "noRemark": "No remarks"
+  },
+  "placeholders": {
+    "enterCompanyName": "Enter company full name",
+    "enterBrandName": "Brand name used externally",
+    "enterIndustry": "e.g., Internet - Enterprise Services",
+    "enterRegion": "e.g., Shenzhen, Guangdong",
+    "enterBizArea": "e.g., Tier-1 cities, New tier-1 cities",
+    "enterScale": "e.g., 100-500 employees, founded in 2015",
+    "enterWebsite": "https://www.example.com",
+    "enterSocialMedia": "One per line: WeChat:xxx / Douyin:xxx / Xiaohongshu:xxx",
+    "enterContactName": "Enter contact person name",
+    "enterContactPhone": "Enter contact phone",
+    "enterContactEmail": "Enter email address",
+    "enterCoreBiz": "Summarize your core business in one sentence",
+    "enterTargetCustomer": "ToB: Industry/Scale; ToC: Demographics/Age/Region",
+    "enterPainPoint": "Describe the main problems or pain points your target customers face",
+    "enterAdvantage": "Technical/Price/Qualification/Service differential features",
+    "enterForbidden": "e.g., No medical promotion; Prohibited keywords: exaggerated, false",
+    "enterProductName": "Product name",
+    "enterProductDesc": "Brief description",
+    "enterSellPoint": "Detailed description of core selling points, main features, and applicable scenarios",
+    "enterServiceDetails": "e.g., Nationwide service, delivery cycle 1-3 months, price range 100k-500k",
+    "enterKeyword": "Enter keyword and press Enter to add",
+    "enterCompetitorName": "Competitor name",
+    "enterCompetitorUrl": "Website URL",
+    "enterCompetitorAnalysis": "Describe each competitor's advantages and disadvantages for AI analysis",
+    "enterMarketGap": "Describe unmet needs or gaps in the market",
+    "enterPromotionArea": "e.g., Beijing, Shanghai, Guangzhou, Shenzhen",
+    "enterForbiddenArea": "e.g., Hong Kong, Macau, Taiwan, overseas",
+    "enterBudget": "e.g., Monthly budget 50k, schedule: 20% testing initially, 60% scaling in mid-phase, 20% optimization later",
+    "enterExpectedEffect": "e.g., 50+ inquiries per month, top 10 in regional ranking, 100k+ impressions",
+    "enterFileRemark": "Add remarks about file usage for accurate AI retrieval",
+    "enterForbiddenWords": "e.g., Prohibited words: best, first, national-level; Forbidden copy: exaggerated claims",
+    "enterCompliance": "e.g., Regional: No promotion in sensitive areas; Industry: Medical must comply with advertising law",
+    "enterPromotionHistory": "e.g., Did GEO promotion in 2025, areas: Beijing, Shanghai, main keywords: XX",
+    "enterSpecialRequirements": "Please specify any other special requirements",
+    "enterVersionRemark": "Fill in the core update content for version tracking"
+  },
+  "toast": {
+    "saveSuccess": "Knowledge base saved successfully!",
+    "saveFailed": "Save failed: {{error}}",
+    "loadFailed": "Failed to load knowledge base"
+  }
+}

@@ -3,6 +3,7 @@ import { ApiTags, ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
 import { ContentService } from '../services/content.service';
 import { ContentAuditService } from '../services/content-audit.service';
 import { ContentGeneratorService, SeoArticleResult, FaqResult, JsonLdResult, ProductDescriptionResult } from '../services/content-generator.service';
+import { KnowledgeAwareContentService } from '../services/knowledge-aware-content.service';
 import { CreateContentDto, QueryContentDto, GenerateSeoArticleDto, GenerateFaqDto, GenerateJsonLdDto, GenerateProductDescriptionDto } from '../dto/content-generation.dto';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 
@@ -15,7 +16,189 @@ export class ContentController {
     private readonly contentService: ContentService,
     private readonly auditService: ContentAuditService,
     private readonly generatorService: ContentGeneratorService,
+    private readonly knowledgeAwareContentService: KnowledgeAwareContentService,
   ) {}
+
+  // ==================== 知识库感知的内容生成 ====================
+
+  /**
+   * 基于知识库生成SEO文章
+   * POST /api/v1/content/generate/seo-article/from-knowledge
+   */
+  @Post('generate/seo-article/from-knowledge')
+  @ApiOperation({ summary: '基于知识库生成SEO文章' })
+  async generateSeoArticleFromKnowledge(
+    @Request() req: any,
+    @Body() body: { keyword?: string },
+  ) {
+    const organizationId = req.user?.organizationId;
+
+    if (!organizationId) {
+      return { success: false, message: '未找到组织信息' };
+    }
+
+    const context = await this.knowledgeAwareContentService.buildSeoArticleContext(
+      organizationId,
+      body.keyword,
+    );
+
+    if (!context) {
+      return {
+        success: false,
+        message: '知识库信息不完整，请先完善品牌知识库',
+      };
+    }
+
+    const result = await this.generatorService.generateSeoArticle(context);
+
+    // 检查内容合规性
+    const checkResult = await this.knowledgeAwareContentService.checkContentAgainstKnowledge(
+      organizationId,
+      result.content,
+    );
+
+    return {
+      success: true,
+      data: result,
+      warnings: checkResult.hasViolation ? checkResult.foundWords : [],
+      context: {
+        brandName: context.brandName,
+        keyword: context.keyword,
+      },
+    };
+  }
+
+  /**
+   * 基于知识库生成FAQ
+   * POST /api/v1/content/generate/faq/from-knowledge
+   */
+  @Post('generate/faq/from-knowledge')
+  @ApiOperation({ summary: '基于知识库生成FAQ问答' })
+  async generateFaqFromKnowledge(
+    @Request() req: any,
+    @Body() body: { faqType?: 'product' | 'service' | 'brand' | 'general' },
+  ) {
+    const organizationId = req.user?.organizationId;
+
+    if (!organizationId) {
+      return { success: false, message: '未找到组织信息' };
+    }
+
+    const context = await this.knowledgeAwareContentService.buildFaqContext(
+      organizationId,
+      body.faqType || 'brand',
+    );
+
+    if (!context) {
+      return {
+        success: false,
+        message: '知识库信息不完整，请先完善品牌知识库',
+      };
+    }
+
+    const result = await this.generatorService.generateFaq(context);
+
+    return {
+      success: true,
+      data: result,
+      context: {
+        brandName: context.name,
+        faqType: context.faqType,
+      },
+    };
+  }
+
+  /**
+   * 基于知识库生成产品描述
+   * POST /api/v1/content/generate/product-description/from-knowledge
+   */
+  @Post('generate/product-description/from-knowledge')
+  @ApiOperation({ summary: '基于知识库生成产品描述' })
+  async generateProductDescriptionFromKnowledge(
+    @Request() req: any,
+    @Body() body: { productName?: string },
+  ) {
+    const organizationId = req.user?.organizationId;
+
+    if (!organizationId) {
+      return { success: false, message: '未找到组织信息' };
+    }
+
+    const context = await this.knowledgeAwareContentService.buildProductDescriptionContext(
+      organizationId,
+      body.productName,
+    );
+
+    if (!context) {
+      return {
+        success: false,
+        message: '知识库缺少产品信息，请先完善产品服务详情',
+      };
+    }
+
+    const result = await this.generatorService.generateProductDescription(context);
+
+    return {
+      success: true,
+      data: result,
+      context: {
+        productName: context.productName,
+        brandName: context.brandName,
+      },
+    };
+  }
+
+  /**
+   * 检查内容与知识库合规性
+   * POST /api/v1/content/check-with-knowledge
+   */
+  @Post('check-with-knowledge')
+  @ApiOperation({ summary: '检查内容与知识库合规性' })
+  async checkWithKnowledge(
+    @Request() req: any,
+    @Body() body: { content: string },
+  ) {
+    const organizationId = req.user?.organizationId;
+
+    if (!organizationId) {
+      return { success: false, message: '未找到组织信息' };
+    }
+
+    const result = await this.knowledgeAwareContentService.checkContentAgainstKnowledge(
+      organizationId,
+      body.content,
+    );
+
+    return {
+      success: true,
+      ...result,
+    };
+  }
+
+  /**
+   * 获取品牌摘要
+   * GET /api/v1/content/brand-summary
+   */
+  @Get('brand-summary')
+  @ApiOperation({ summary: '获取品牌摘要用于内容生成' })
+  async getBrandSummary(@Request() req: any) {
+    const organizationId = req.user?.organizationId;
+
+    if (!organizationId) {
+      return { success: false, message: '未找到组织信息' };
+    }
+
+    const summary = await this.knowledgeAwareContentService.getBrandSummary(organizationId);
+
+    if (!summary) {
+      return { success: false, message: '未找到知识库' };
+    }
+
+    return {
+      success: true,
+      data: summary,
+    };
+  }
 
   // ==================== 基础CRUD ====================
 

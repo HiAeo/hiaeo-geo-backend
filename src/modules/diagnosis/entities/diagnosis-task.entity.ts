@@ -4,8 +4,6 @@ import {
   Column,
   CreateDateColumn,
   UpdateDateColumn,
-  ManyToOne,
-  JoinColumn,
 } from 'typeorm';
 
 export enum DiagnosisStatus {
@@ -31,6 +29,12 @@ export class DiagnosisTask {
   @Column({ name: 'user_id' })
   userId: string;
 
+  @Column({ name: 'organization_id', nullable: true })
+  organizationId: string;
+
+  @Column({ name: 'brand_id', nullable: true })
+  brandId: string;
+
   @Column({ name: 'brand_name' })
   brandName: string;
 
@@ -44,14 +48,14 @@ export class DiagnosisTask {
   targetMarket: string;
 
   @Column({
-    type: 'enum',
+    type: 'simple-enum',
     enum: DiagnosisType,
     default: DiagnosisType.FULL,
   })
   type: DiagnosisType;
 
   @Column({
-    type: 'enum',
+    type: 'simple-enum',
     enum: DiagnosisStatus,
     default: DiagnosisStatus.PENDING,
   })
@@ -63,7 +67,7 @@ export class DiagnosisTask {
   @Column({ name: 'progress', default: 0 })
   progress: number;
 
-  @Column({ type: 'jsonb', nullable: true })
+  @Column({ type: 'json', nullable: true })
   config: Record<string, any>;
 
   @Column({ name: 'report_id', nullable: true })

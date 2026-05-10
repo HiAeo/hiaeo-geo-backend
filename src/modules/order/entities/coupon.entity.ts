@@ -25,7 +25,7 @@ export class Coupon {
   @Column({ type: 'text', nullable: true })
   description: string;
 
-  @Column({ type: 'enum', enum: CouponType })
+  @Column({ type: 'simple-enum', enum: CouponType })
   type: CouponType;
 
   @Column({ type: 'decimal', precision: 10, scale: 2 })
@@ -52,14 +52,14 @@ export class Coupon {
   @Column({ name: 'end_date', type: 'date' })
   endDate: Date;
 
-  @Column({ name: 'applicable_packages', type: 'jsonb', default: '[]' })
+  @Column({ name: 'applicable_packages', type: 'json', default: '[]' })
   applicablePackages: string[];
 
   @Column({ name: 'is_first_order', default: false })
   isFirstOrder: boolean;
 
   @Column({
-    type: 'enum',
+    type: 'simple-enum',
     enum: CouponStatus,
     default: CouponStatus.ACTIVE,
   })

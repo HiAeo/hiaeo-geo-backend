@@ -56,7 +56,7 @@ export class CreditTransaction {
   userId: string;
 
   @Column({
-    type: 'enum',
+    type: 'simple-enum',
     enum: TransactionType,
     default: TransactionType.EARN,
   })
@@ -64,7 +64,7 @@ export class CreditTransaction {
 
   @Column({
     name: 'source_type',
-    type: 'enum',
+    type: 'simple-enum',
     enum: SourceType,
   })
   sourceType: SourceType;
@@ -73,7 +73,7 @@ export class CreditTransaction {
   amount: number;
 
   @Column({
-    type: 'enum',
+    type: 'simple-enum',
     enum: TransactionStatus,
     default: TransactionStatus.COMPLETED,
   })

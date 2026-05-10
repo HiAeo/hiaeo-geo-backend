@@ -102,6 +102,14 @@ export class QwenAdapter implements AIEngineAdapter {
     }
   }
 
+  isAvailable(): boolean {
+    return !!this.apiKey && this.apiKey.length > 0;
+  }
+
+  async diagnoseSEO(params: { targetUrl: string; targetName?: string; targetIndustry?: string; keywords?: string[] }): Promise<any> {
+    throw new Error('Qwen暂不支持SEO诊断');
+  }
+
   private buildDiagnosisPrompt(params: BrandDiagnosisParams): string {
     return `请对品牌"${params.brandName}"进行GEO诊断分析，返回JSON格式结果。`;
   }

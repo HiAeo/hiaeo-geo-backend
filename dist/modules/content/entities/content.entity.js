@@ -47,6 +47,30 @@ __decorate([
     __metadata("design:type", String)
 ], Content.prototype, "userId", void 0);
 __decorate([
+    (0, typeorm_1.Column)({ name: 'organization_id', nullable: true }),
+    __metadata("design:type", String)
+], Content.prototype, "organizationId", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ name: 'brand_id', nullable: true }),
+    __metadata("design:type", String)
+], Content.prototype, "brandId", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ type: 'boolean', default: false }),
+    __metadata("design:type", Boolean)
+], Content.prototype, "published", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ length: 50, nullable: true }),
+    __metadata("design:type", String)
+], Content.prototype, "platform", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ length: 50, nullable: true }),
+    __metadata("design:type", String)
+], Content.prototype, "aiEngine", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ type: 'int', default: 0 }),
+    __metadata("design:type", Number)
+], Content.prototype, "engagement", void 0);
+__decorate([
     (0, typeorm_1.CreateDateColumn)({ name: 'created_at' }),
     __metadata("design:type", Date)
 ], Content.prototype, "createdAt", void 0);

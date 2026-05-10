@@ -5,4 +5,5 @@ export declare class CreateOrderDto {
     originalAmount?: number;
     discount?: number;
     remark?: string;
+    couponCode?: string;
 }

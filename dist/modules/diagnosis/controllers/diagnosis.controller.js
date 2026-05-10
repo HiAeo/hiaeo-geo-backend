@@ -26,16 +26,31 @@ let DiagnosisController = class DiagnosisController {
     }
     async createTask(userId, dto) {
         const task = await this.taskService.createTask(userId, dto);
-        setImmediate(() => {
-            this.executor.execute(task.id).catch((error) => {
-                console.error(`诊断任务 ${task.id} 自动执行失败:`, error);
-            });
-        });
+        this.runDiagnosisAsync(task.id);
         return {
             success: true,
             data: this.mapTaskToResponse(task),
             message: '诊断任务已创建，正在后台执行',
         };
+    }
+    async runDiagnosisAsync(taskId) {
+        process.nextTick(async () => {
+            console.log(`[DiagnosisController] 开始异步执行诊断任务 ${taskId}`);
+            try {
+                const result = await this.executor.execute(taskId);
+                console.log(`[DiagnosisController] 诊断任务 ${taskId} 执行完成:`, {
+                    success: result.success,
+                    reportId: result.reportId,
+                });
+                if (result.reportId) {
+                    await this.taskService.linkReport(taskId, result.reportId);
+                    console.log(`[DiagnosisController] 报告 ${result.reportId} 已关联到任务 ${taskId}`);
+                }
+            }
+            catch (error) {
+                console.error(`[DiagnosisController] 诊断任务 ${taskId} 自动执行失败:`, error);
+            }
+        });
     }
     async queryTasks(userId, query) {
         query.userId = userId;

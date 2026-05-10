@@ -15,10 +15,52 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.HubController = void 0;
 const common_1 = require("@nestjs/common");
 const hub_service_1 = require("../services/hub.service");
+const knowledge_data_source_service_1 = require("../services/knowledge-data-source.service");
 const swagger_1 = require("@nestjs/swagger");
 let HubController = class HubController {
-    constructor(hubService) {
+    constructor(hubService, knowledgeDataSourceService) {
         this.hubService = hubService;
+        this.knowledgeDataSourceService = knowledgeDataSourceService;
+    }
+    async getKnowledgeHealth(req) {
+        const organizationId = req.user?.organizationId;
+        if (!organizationId) {
+            return { success: false, message: '未找到组织信息' };
+        }
+        const health = await this.knowledgeDataSourceService.getKnowledgeHealthMetrics(organizationId);
+        return {
+            success: true,
+            data: health,
+        };
+    }
+    async getKnowledgeStats() {
+        const stats = await this.knowledgeDataSourceService.getKnowledgeStats('');
+        return {
+            success: true,
+            data: stats,
+        };
+    }
+    async getKnowledgeTrend(req, days) {
+        const organizationId = req.user?.organizationId;
+        if (!organizationId) {
+            return { success: false, message: '未找到组织信息' };
+        }
+        const trend = await this.knowledgeDataSourceService.getCompletenessTrend(organizationId, days ? parseInt(days, 10) : 30);
+        return {
+            success: true,
+            data: trend,
+        };
+    }
+    async getKnowledgeDiagnosisCorrelation(req) {
+        const organizationId = req.user?.organizationId;
+        if (!organizationId) {
+            return { success: false, message: '未找到组织信息' };
+        }
+        const correlation = await this.knowledgeDataSourceService.getKnowledgeDiagnosisCorrelation(organizationId);
+        return {
+            success: true,
+            data: correlation,
+        };
     }
     async getStats(brandId) {
         return this.hubService.getStats(brandId);
@@ -46,6 +88,39 @@ let HubController = class HubController {
     }
 };
 exports.HubController = HubController;
+__decorate([
+    (0, common_1.Get)('knowledge-health'),
+    (0, swagger_1.ApiOperation)({ summary: '获取知识库健康度指标' }),
+    (0, swagger_1.ApiResponse)({ status: 200, description: '知识库健康度数据' }),
+    __param(0, (0, common_1.Request)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], HubController.prototype, "getKnowledgeHealth", null);
+__decorate([
+    (0, common_1.Get)('knowledge-stats'),
+    (0, swagger_1.ApiOperation)({ summary: '获取知识库统计概览' }),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", Promise)
+], HubController.prototype, "getKnowledgeStats", null);
+__decorate([
+    (0, common_1.Get)('knowledge-trend'),
+    (0, swagger_1.ApiOperation)({ summary: '获取知识库完整度趋势' }),
+    __param(0, (0, common_1.Request)()),
+    __param(1, (0, common_1.Query)('days')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, String]),
+    __metadata("design:returntype", Promise)
+], HubController.prototype, "getKnowledgeTrend", null);
+__decorate([
+    (0, common_1.Get)('knowledge-diagnosis-correlation'),
+    (0, swagger_1.ApiOperation)({ summary: '获取诊断与知识库关联数据' }),
+    __param(0, (0, common_1.Request)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], HubController.prototype, "getKnowledgeDiagnosisCorrelation", null);
 __decorate([
     (0, common_1.Get)('stats'),
     (0, swagger_1.ApiOperation)({ summary: '获取Hub统计数据' }),
@@ -113,6 +188,7 @@ __decorate([
 exports.HubController = HubController = __decorate([
     (0, swagger_1.ApiTags)('Hub管理驾驶舱'),
     (0, common_1.Controller)('hub'),
-    __metadata("design:paramtypes", [hub_service_1.HubService])
+    __metadata("design:paramtypes", [hub_service_1.HubService,
+        knowledge_data_source_service_1.KnowledgeDataSourceService])
 ], HubController);
 //# sourceMappingURL=hub.controller.js.map

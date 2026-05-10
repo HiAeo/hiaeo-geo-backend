@@ -20,8 +20,8 @@ export declare class Order {
     amount: number;
     originalAmount: number;
     discount: number;
-    status: OrderStatus;
-    paymentMethod: PaymentMethod;
+    status: string;
+    paymentMethod: string;
     paymentTime: Date;
     transactionId: string;
     remark: string;

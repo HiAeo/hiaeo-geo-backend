@@ -68,15 +68,15 @@ __decorate([
     __metadata("design:type", String)
 ], Notification.prototype, "content", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ type: 'enum', enum: NotificationType }),
+    (0, typeorm_1.Column)({ type: 'simple-enum', enum: NotificationType }),
     __metadata("design:type", String)
 ], Notification.prototype, "type", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ type: 'simple-array' }),
+    (0, typeorm_1.Column)({ type: 'json' }),
     __metadata("design:type", Array)
 ], Notification.prototype, "channels", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ type: 'enum', enum: NotificationStatus, default: NotificationStatus.PENDING }),
+    (0, typeorm_1.Column)({ type: 'simple-enum', enum: NotificationStatus, default: NotificationStatus.PENDING }),
     __metadata("design:type", String)
 ], Notification.prototype, "status", void 0);
 __decorate([
@@ -92,7 +92,7 @@ __decorate([
     __metadata("design:type", String)
 ], Notification.prototype, "actionText", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ type: 'timestamp', nullable: true }),
+    (0, typeorm_1.Column)({ type: 'datetime', nullable: true }),
     __metadata("design:type", Date)
 ], Notification.prototype, "sentAt", void 0);
 __decorate([
@@ -100,7 +100,7 @@ __decorate([
     __metadata("design:type", String)
 ], Notification.prototype, "errorMessage", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ type: 'timestamp', nullable: true }),
+    (0, typeorm_1.Column)({ type: 'datetime', nullable: true }),
     __metadata("design:type", Date)
 ], Notification.prototype, "readAt", void 0);
 __decorate([

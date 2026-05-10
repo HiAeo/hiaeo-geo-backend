@@ -107,6 +107,12 @@ let WenxinAdapter = class WenxinAdapter {
             return { message: { role: 'assistant', content: '抱歉，文心服务暂时不可用。' } };
         }
     }
+    isAvailable() {
+        return !!this.apiKey && !!this.secretKey && this.apiKey.length > 0 && this.secretKey.length > 0;
+    }
+    async diagnoseSEO(params) {
+        throw new Error('文心暂不支持SEO诊断');
+    }
     buildDiagnosisPrompt(params) {
         return `请对品牌"${params.brandName}"进行GEO诊断分析，返回JSON格式结果。`;
     }

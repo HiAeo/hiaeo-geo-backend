@@ -35,6 +35,14 @@ __decorate([
     __metadata("design:type", String)
 ], DiagnosisReport.prototype, "userId", void 0);
 __decorate([
+    (0, typeorm_1.Column)({ name: 'organization_id', nullable: true }),
+    __metadata("design:type", String)
+], DiagnosisReport.prototype, "organizationId", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ name: 'brand_id', nullable: true }),
+    __metadata("design:type", String)
+], DiagnosisReport.prototype, "brandId", void 0);
+__decorate([
     (0, typeorm_1.Column)({ name: 'brand_name' }),
     __metadata("design:type", String)
 ], DiagnosisReport.prototype, "brandName", void 0);
@@ -45,7 +53,7 @@ __decorate([
 __decorate([
     (0, typeorm_1.Column)({
         name: 'grade',
-        type: 'enum',
+        type: 'simple-enum',
         enum: ReportGrade,
         default: ReportGrade.FAIR,
     }),
@@ -56,19 +64,19 @@ __decorate([
     __metadata("design:type", Number)
 ], DiagnosisReport.prototype, "healthLevel", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ type: 'jsonb' }),
+    (0, typeorm_1.Column)({ name: 'dimension_scores', type: 'json' }),
     __metadata("design:type", Array)
 ], DiagnosisReport.prototype, "dimensionScores", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ type: 'jsonb', nullable: true }),
+    (0, typeorm_1.Column)({ name: 'competitor_analysis', type: 'json', nullable: true }),
     __metadata("design:type", Object)
 ], DiagnosisReport.prototype, "competitorAnalysis", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ type: 'jsonb' }),
+    (0, typeorm_1.Column)({ type: 'json' }),
     __metadata("design:type", Array)
 ], DiagnosisReport.prototype, "issues", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ type: 'jsonb' }),
+    (0, typeorm_1.Column)({ type: 'json' }),
     __metadata("design:type", Array)
 ], DiagnosisReport.prototype, "suggestions", void 0);
 __decorate([
@@ -80,11 +88,11 @@ __decorate([
     __metadata("design:type", String)
 ], DiagnosisReport.prototype, "aiInsights", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ type: 'jsonb', nullable: true }),
+    (0, typeorm_1.Column)({ name: 'raw_ai_response', type: 'json', nullable: true }),
     __metadata("design:type", Object)
 ], DiagnosisReport.prototype, "rawAiResponse", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ name: 'engines_used', type: 'jsonb', default: [] }),
+    (0, typeorm_1.Column)({ name: 'engines_used', type: 'json', default: '[]' }),
     __metadata("design:type", Array)
 ], DiagnosisReport.prototype, "enginesUsed", void 0);
 __decorate([

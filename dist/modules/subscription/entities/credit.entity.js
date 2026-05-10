@@ -81,7 +81,7 @@ __decorate([
 ], CreditTransaction.prototype, "userId", void 0);
 __decorate([
     (0, typeorm_1.Column)({
-        type: 'enum',
+        type: 'simple-enum',
         enum: TransactionType,
         default: TransactionType.EARN,
     }),
@@ -90,7 +90,7 @@ __decorate([
 __decorate([
     (0, typeorm_1.Column)({
         name: 'source_type',
-        type: 'enum',
+        type: 'simple-enum',
         enum: SourceType,
     }),
     __metadata("design:type", String)
@@ -101,7 +101,7 @@ __decorate([
 ], CreditTransaction.prototype, "amount", void 0);
 __decorate([
     (0, typeorm_1.Column)({
-        type: 'enum',
+        type: 'simple-enum',
         enum: TransactionStatus,
         default: TransactionStatus.COMPLETED,
     }),

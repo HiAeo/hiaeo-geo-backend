@@ -29,9 +29,8 @@ let ContentGeneratorService = class ContentGeneratorService {
         try {
             const result = await this.aiService.chat({
                 messages: [{ role: 'user', content: prompt }],
-                model: 'auto',
             }, 'deepseek');
-            return this.parseSeoArticleResult(result.content, keyword);
+            return this.parseSeoArticleResult(result.message.content, keyword);
         }
         catch (error) {
             return this.getSampleSeoArticle(keyword, brandName);
@@ -43,9 +42,8 @@ let ContentGeneratorService = class ContentGeneratorService {
         try {
             const result = await this.aiService.chat({
                 messages: [{ role: 'user', content: prompt }],
-                model: 'auto',
             }, 'deepseek');
-            const faqs = this.parseFaqResult(result.content);
+            const faqs = this.parseFaqResult(result.message.content);
             const jsonLd = this.generateFaqJsonLd(name, faqs);
             return { name, faqs, jsonLd };
         }
@@ -74,9 +72,8 @@ let ContentGeneratorService = class ContentGeneratorService {
         try {
             const result = await this.aiService.chat({
                 messages: [{ role: 'user', content: prompt }],
-                model: 'auto',
             }, 'deepseek');
-            return this.parseProductDescriptionResult(result.content, productName);
+            return this.parseProductDescriptionResult(result.message.content, productName);
         }
         catch (error) {
             return this.getSampleProductDescription(productName, category);
@@ -99,9 +96,8 @@ ${content}
         try {
             const result = await this.aiService.chat({
                 messages: [{ role: 'user', content: prompt }],
-                model: 'auto',
             }, 'deepseek');
-            return result.content;
+            return result.message.content;
         }
         catch (error) {
             return content;

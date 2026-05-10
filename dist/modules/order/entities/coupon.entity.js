@@ -42,7 +42,7 @@ __decorate([
     __metadata("design:type", String)
 ], Coupon.prototype, "description", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ type: 'enum', enum: CouponType }),
+    (0, typeorm_1.Column)({ type: 'simple-enum', enum: CouponType }),
     __metadata("design:type", String)
 ], Coupon.prototype, "type", void 0);
 __decorate([
@@ -78,7 +78,7 @@ __decorate([
     __metadata("design:type", Date)
 ], Coupon.prototype, "endDate", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ name: 'applicable_packages', type: 'jsonb', default: '[]' }),
+    (0, typeorm_1.Column)({ name: 'applicable_packages', type: 'json', default: '[]' }),
     __metadata("design:type", Array)
 ], Coupon.prototype, "applicablePackages", void 0);
 __decorate([
@@ -87,7 +87,7 @@ __decorate([
 ], Coupon.prototype, "isFirstOrder", void 0);
 __decorate([
     (0, typeorm_1.Column)({
-        type: 'enum',
+        type: 'simple-enum',
         enum: CouponStatus,
         default: CouponStatus.ACTIVE,
     }),

@@ -64,13 +64,13 @@ export class Notification {
   @Column({ type: 'text' })
   content: string;
 
-  @Column({ type: 'enum', enum: NotificationType })
+  @Column({ type: 'simple-enum', enum: NotificationType })
   type: NotificationType;
 
-  @Column({ type: 'simple-array' })
+  @Column({ type: 'json' })
   channels: NotificationChannel[];  // 发送渠道
 
-  @Column({ type: 'enum', enum: NotificationStatus, default: NotificationStatus.PENDING })
+  @Column({ type: 'simple-enum', enum: NotificationStatus, default: NotificationStatus.PENDING })
   status: NotificationStatus;
 
   @Column({ type: 'json', nullable: true })
@@ -83,14 +83,14 @@ export class Notification {
   actionText: string;  // 操作按钮文字
 
   // 发送记录
-  @Column({ type: 'timestamp', nullable: true })
+  @Column({ type: 'datetime', nullable: true })
   sentAt: Date;
 
   @Column({ type: 'text', nullable: true })
   errorMessage: string;
 
   // 读取记录
-  @Column({ type: 'timestamp', nullable: true })
+  @Column({ type: 'datetime', nullable: true })
   readAt: Date;
 
   @CreateDateColumn()

@@ -41,20 +41,11 @@ export class Order {
   @Column({ type: 'decimal', precision: 10, scale: 2, nullable: true })
   discount: number;
 
-  @Column({
-    type: 'enum',
-    enum: OrderStatus,
-    default: OrderStatus.PENDING,
-  })
-  status: OrderStatus;
+  @Column()
+  status: string;
 
-  @Column({
-    name: 'payment_method',
-    type: 'enum',
-    enum: PaymentMethod,
-    nullable: true,
-  })
-  paymentMethod: PaymentMethod;
+  @Column({ name: 'payment_method', nullable: true })
+  paymentMethod: string;
 
   @Column({ name: 'payment_time', nullable: true })
   paymentTime: Date;

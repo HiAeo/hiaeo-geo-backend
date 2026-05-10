@@ -16,64 +16,218 @@ exports.StrategyController = void 0;
 const common_1 = require("@nestjs/common");
 const swagger_1 = require("@nestjs/swagger");
 const strategy_service_1 = require("../services/strategy.service");
+const mofa_strategy_service_1 = require("../services/mofa-strategy.service");
+const knowledge_aware_strategy_service_1 = require("../services/knowledge-aware-strategy.service");
+const strategy_dto_1 = require("../dto/strategy.dto");
+const mofa_strategy_dto_1 = require("../dto/mofa-strategy.dto");
 let StrategyController = class StrategyController {
-    constructor(strategyService) {
+    constructor(strategyService, mofaStrategyService, knowledgeAwareStrategyService) {
         this.strategyService = strategyService;
+        this.mofaStrategyService = mofaStrategyService;
+        this.knowledgeAwareStrategyService = knowledgeAwareStrategyService;
     }
-    async getList(brandId, status) {
-        return this.strategyService.getList({ brandId, status });
+    async generateFromKnowledge(req, body) {
+        const organizationId = req.user?.organizationId;
+        if (!organizationId) {
+            return { success: false, message: '未找到组织信息' };
+        }
+        const strategyType = body.strategyType || mofa_strategy_dto_1.StrategyType.CONTENT;
+        const result = await this.knowledgeAwareStrategyService.generateStrategyFromKnowledge(organizationId, strategyType);
+        if (!result.success || !result.data) {
+            return { success: false, message: result.error || '无法获取知识库数据' };
+        }
+        const strategy = await this.mofaStrategyService.generateStrategy(result.data);
+        return {
+            success: true,
+            data: strategy,
+            context: {
+                brandName: result.data.brandName,
+                keywords: result.data.keywords,
+            },
+            message: '基于知识库的策略生成成功',
+        };
     }
-    async getById(id) {
-        return this.strategyService.getById(id);
+    async getKnowledgeContext(req) {
+        const organizationId = req.user?.organizationId;
+        if (!organizationId) {
+            return { success: false, message: '未找到组织信息' };
+        }
+        const context = await this.knowledgeAwareStrategyService.getKnowledgeContextForStrategy(organizationId);
+        if (!context) {
+            return { success: false, message: '未找到知识库' };
+        }
+        return { success: true, data: context };
     }
-    async generate(data) {
-        return this.strategyService.generate(data);
+    async validateConsistency(req, body) {
+        const organizationId = req.user?.organizationId;
+        if (!organizationId) {
+            return { success: false, message: '未找到组织信息' };
+        }
+        const result = await this.knowledgeAwareStrategyService.validateStrategyConsistency(organizationId, body.strategy);
+        return { success: true, ...result };
     }
-    async update(id, data) {
-        return this.strategyService.update(id, data);
+    async generateFromReport(userId, dto) {
+        dto.userId = userId;
+        const strategy = await this.strategyService.generateFromDiagnosisReport(dto);
+        return {
+            success: true,
+            data: strategy,
+            message: '基于诊断报告的策略生成成功',
+        };
+    }
+    async generate(userId, data) {
+        data.userId = userId;
+        const strategy = await this.strategyService.generate(data);
+        return {
+            success: true,
+            data: strategy,
+            message: '策略生成成功',
+        };
+    }
+    async getList(userId, brandId, status) {
+        const result = await this.strategyService.getList({ brandId, status, userId });
+        return {
+            success: true,
+            data: result,
+        };
+    }
+    async getById(userId, id) {
+        const strategy = await this.strategyService.getById(id);
+        if (!strategy) {
+            return { success: false, message: '策略不存在' };
+        }
+        return {
+            success: true,
+            data: strategy,
+        };
+    }
+    async create(userId, dto) {
+        dto.userId = userId;
+        const strategy = await this.strategyService.create(dto);
+        return {
+            success: true,
+            data: strategy,
+            message: '策略创建成功',
+        };
+    }
+    async update(id, dto) {
+        const strategy = await this.strategyService.update(id, dto);
+        if (!strategy) {
+            return { success: false, message: '策略不存在' };
+        }
+        return {
+            success: true,
+            data: strategy,
+            message: '策略更新成功',
+        };
     }
     async delete(id) {
-        return this.strategyService.delete(id);
+        const success = await this.strategyService.delete(id);
+        return {
+            success,
+            message: success ? '策略删除成功' : '策略不存在',
+        };
     }
     async execute(id) {
-        return this.strategyService.execute(id);
+        const result = await this.strategyService.execute(id);
+        return {
+            success: result.success,
+            data: { executionId: result.executionId },
+            message: result.message,
+        };
     }
 };
 exports.StrategyController = StrategyController;
 __decorate([
+    (0, common_1.Post)('from-knowledge'),
+    (0, swagger_1.ApiOperation)({ summary: '基于知识库生成策略' }),
+    (0, swagger_1.ApiHeader)({ name: 'Authorization', description: '用户Token', required: false }),
+    __param(0, (0, common_1.Request)()),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, Object]),
+    __metadata("design:returntype", Promise)
+], StrategyController.prototype, "generateFromKnowledge", null);
+__decorate([
+    (0, common_1.Get)('knowledge-context'),
+    (0, swagger_1.ApiOperation)({ summary: '获取知识库上下文用于策略生成' }),
+    (0, swagger_1.ApiHeader)({ name: 'Authorization', description: '用户Token', required: false }),
+    __param(0, (0, common_1.Request)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], StrategyController.prototype, "getKnowledgeContext", null);
+__decorate([
+    (0, common_1.Post)('validate-consistency'),
+    (0, swagger_1.ApiOperation)({ summary: '验证策略与知识库的一致性' }),
+    (0, swagger_1.ApiHeader)({ name: 'Authorization', description: '用户Token', required: false }),
+    __param(0, (0, common_1.Request)()),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, Object]),
+    __metadata("design:returntype", Promise)
+], StrategyController.prototype, "validateConsistency", null);
+__decorate([
+    (0, common_1.Post)('generate-from-report'),
+    (0, swagger_1.ApiOperation)({ summary: '基于诊断报告生成策略' }),
+    (0, swagger_1.ApiHeader)({ name: 'x-user-id', description: '用户ID', required: false }),
+    (0, swagger_1.ApiResponse)({ status: 201, description: '策略生成成功' }),
+    __param(0, (0, common_1.Headers)('x-user-id')),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, strategy_dto_1.GenerateStrategyFromReportDto]),
+    __metadata("design:returntype", Promise)
+], StrategyController.prototype, "generateFromReport", null);
+__decorate([
+    (0, common_1.Post)('generate'),
+    (0, swagger_1.ApiOperation)({ summary: '生成策略' }),
+    (0, swagger_1.ApiHeader)({ name: 'x-user-id', description: '用户ID', required: false }),
+    __param(0, (0, common_1.Headers)('x-user-id')),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, Object]),
+    __metadata("design:returntype", Promise)
+], StrategyController.prototype, "generate", null);
+__decorate([
     (0, common_1.Get)(),
     (0, swagger_1.ApiOperation)({ summary: '获取策略列表' }),
+    (0, swagger_1.ApiHeader)({ name: 'x-user-id', description: '用户ID', required: false }),
     (0, swagger_1.ApiQuery)({ name: 'brandId', required: false, description: '品牌ID' }),
     (0, swagger_1.ApiQuery)({ name: 'status', required: false, description: '策略状态' }),
-    __param(0, (0, common_1.Query)('brandId')),
-    __param(1, (0, common_1.Query)('status')),
+    __param(0, (0, common_1.Headers)('x-user-id')),
+    __param(1, (0, common_1.Query)('brandId')),
+    __param(2, (0, common_1.Query)('status')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, String]),
+    __metadata("design:paramtypes", [String, String, String]),
     __metadata("design:returntype", Promise)
 ], StrategyController.prototype, "getList", null);
 __decorate([
     (0, common_1.Get)(':id'),
     (0, swagger_1.ApiOperation)({ summary: '获取策略详情' }),
-    __param(0, (0, common_1.Param)('id')),
+    (0, swagger_1.ApiHeader)({ name: 'x-user-id', description: '用户ID', required: false }),
+    __param(0, (0, common_1.Headers)('x-user-id')),
+    __param(1, (0, common_1.Param)('id')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String]),
+    __metadata("design:paramtypes", [String, String]),
     __metadata("design:returntype", Promise)
 ], StrategyController.prototype, "getById", null);
 __decorate([
-    (0, common_1.Post)('generate'),
-    (0, swagger_1.ApiOperation)({ summary: '生成策略' }),
-    __param(0, (0, common_1.Body)()),
+    (0, common_1.Post)(),
+    (0, swagger_1.ApiOperation)({ summary: '创建策略' }),
+    (0, swagger_1.ApiHeader)({ name: 'x-user-id', description: '用户ID', required: false }),
+    __param(0, (0, common_1.Headers)('x-user-id')),
+    __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object]),
+    __metadata("design:paramtypes", [String, strategy_dto_1.CreateStrategyDto]),
     __metadata("design:returntype", Promise)
-], StrategyController.prototype, "generate", null);
+], StrategyController.prototype, "create", null);
 __decorate([
     (0, common_1.Put)(':id'),
     (0, swagger_1.ApiOperation)({ summary: '更新策略' }),
     __param(0, (0, common_1.Param)('id')),
     __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, Object]),
+    __metadata("design:paramtypes", [String, strategy_dto_1.UpdateStrategyDto]),
     __metadata("design:returntype", Promise)
 ], StrategyController.prototype, "update", null);
 __decorate([
@@ -95,6 +249,8 @@ __decorate([
 exports.StrategyController = StrategyController = __decorate([
     (0, swagger_1.ApiTags)('策略管理'),
     (0, common_1.Controller)('strategy'),
-    __metadata("design:paramtypes", [strategy_service_1.StrategyService])
+    __metadata("design:paramtypes", [strategy_service_1.StrategyService,
+        mofa_strategy_service_1.MofaStrategyService,
+        knowledge_aware_strategy_service_1.KnowledgeAwareStrategyService])
 ], StrategyController);
 //# sourceMappingURL=strategy.controller.js.map

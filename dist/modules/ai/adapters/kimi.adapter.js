@@ -94,6 +94,12 @@ let KimiAdapter = class KimiAdapter {
             return { message: { role: 'assistant', content: '抱歉，Kimi服务暂时不可用。' } };
         }
     }
+    isAvailable() {
+        return !!this.apiKey && this.apiKey.length > 0;
+    }
+    async diagnoseSEO(params) {
+        throw new Error('Kimi暂不支持SEO诊断');
+    }
     buildDiagnosisPrompt(params) {
         return `请对品牌"${params.brandName}"进行GEO诊断分析，返回JSON格式结果。`;
     }

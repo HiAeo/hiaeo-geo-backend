@@ -35,7 +35,7 @@ export class EnterpriseTransfer {
   @Column({ type: 'varchar', length: 50, unique: true })
   transferNo: string;  // 汇款单号
 
-  @Column({ type: 'enum', enum: TransferStatus, default: TransferStatus.PENDING })
+  @Column({ type: 'simple-enum', enum: TransferStatus, default: TransferStatus.PENDING })
   status: TransferStatus;
 
   @Column({ type: 'decimal', precision: 10, scale: 2 })
@@ -75,13 +75,13 @@ export class EnterpriseTransfer {
   serialNo: string;  // 银行流水号
 
   // 审核信息
-  @Column({ type: 'enum', enum: TransferStatus, default: TransferStatus.PENDING })
+  @Column({ type: 'simple-enum', enum: TransferStatus, default: TransferStatus.PENDING })
   verifiedStatus: TransferStatus;
 
   @Column({ type: 'uuid', nullable: true })
   verifiedBy: string;
 
-  @Column({ type: 'timestamp', nullable: true })
+  @Column({ type: 'datetime', nullable: true })
   verifiedAt: Date;
 
   @Column({ type: 'text', nullable: true })

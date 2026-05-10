@@ -1,0 +1,41 @@
+export declare const PERMISSIONS: {
+    readonly KNOWLEDGE_READ: "knowledge:read";
+    readonly KNOWLEDGE_WRITE: "knowledge:write";
+    readonly KNOWLEDGE_DELETE: "knowledge:delete";
+    readonly KNOWLEDGE_AUDIT: "knowledge:audit";
+    readonly WORKFLOW_READ: "workflow:read";
+    readonly WORKFLOW_WRITE: "workflow:write";
+    readonly WORKFLOW_EXECUTE: "workflow:execute";
+    readonly CONTENT_READ: "content:read";
+    readonly CONTENT_WRITE: "content:write";
+    readonly USER_MANAGE: "user:manage";
+    readonly ROLE_MANAGE: "role:manage";
+    readonly AUDIT_VIEW: "audit:view";
+    readonly BRAND_READ: "brand:read";
+    readonly BRAND_WRITE: "brand:write";
+    readonly STRATEGY_READ: "strategy:read";
+    readonly STRATEGY_WRITE: "strategy:write";
+    readonly PUBLISH_READ: "publish:read";
+    readonly PUBLISH_EXECUTE: "publish:execute";
+};
+export type PermissionCode = typeof PERMISSIONS[keyof typeof PERMISSIONS];
+export declare const PERMISSION_MODULES: {
+    readonly KNOWLEDGE: "KNOWLEDGE";
+    readonly WORKFLOW: "WORKFLOW";
+    readonly CONTENT: "CONTENT";
+    readonly USER: "USER";
+    readonly ROLE: "ROLE";
+    readonly AUDIT: "AUDIT";
+    readonly BRAND: "BRAND";
+    readonly STRATEGY: "STRATEGY";
+    readonly PUBLISH: "PUBLISH";
+};
+export type PermissionModule = typeof PERMISSION_MODULES[keyof typeof PERMISSION_MODULES];
+export declare const SYSTEM_ROLES: {
+    readonly ADMIN: "ADMIN";
+    readonly EDITOR: "EDITOR";
+    readonly VIEWER: "VIEWER";
+    readonly GUEST: "GUEST";
+};
+export type SystemRoleCode = typeof SYSTEM_ROLES[keyof typeof SYSTEM_ROLES];
+export declare const DEFAULT_ROLE_PERMISSIONS: Record<SystemRoleCode, PermissionCode[]>;

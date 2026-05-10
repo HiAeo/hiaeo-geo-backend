@@ -1,0 +1,167 @@
+{
+  "title": "品牌知识库",
+  "subtitle": "完善品牌信息，AI将为您生成更精准的诊断报告与优化策略",
+  "version": "版本",
+  "lastUpdate": "最后更新",
+  "versionHistory": "版本历史",
+  "saveKnowledge": "保存知识库",
+  "saving": "保存中...",
+  "progress": "{{completed}}/{{total}} 模块已完成",
+  "modules": {
+    "basicInfo": {
+      "title": "企业基础信息",
+      "required": "*必填",
+      "companyName": "公司全称",
+      "companyShortName": "品牌简称/对外名称",
+      "industry": "所属行业&细分赛道",
+      "companyRegion": "总部所在地",
+      "mainBizArea": "主营推广区域",
+      "bizModel": "业务模式",
+      "companyScale": "企业规模/成立时间",
+      "website": "企业官网",
+      "socialMedia": "社媒账号",
+      "contactName": "对接人姓名",
+      "contactPhone": "联系电话",
+      "contactEmail": "联系邮箱"
+    },
+    "bizPositioning": {
+      "title": "核心业务与定位",
+      "required": "*必填",
+      "coreBizIntro": "核心业务一句话介绍",
+      "targetCustomer": "目标客户群体",
+      "customerPainPoint": "客户核心痛点",
+      "differentialAdvantage": "企业差异化优势",
+      "forbiddenBiz": "禁止推广/不承接业务、禁忌关键词"
+    },
+    "productService": {
+      "title": "产品与服务详情",
+      "required": "*必填",
+      "productServiceList": "主营产品/服务清单",
+      "productName": "产品/服务名称",
+      "productDesc": "简介",
+      "productSellPoint": "产品卖点、功能、应用场景",
+      "serviceDetails": "服务范围、交付周期、价格区间/套餐",
+      "coreKeywords": "客户自认知核心关键词",
+      "addProduct": "添加产品"
+    },
+    "competitorMarket": {
+      "title": "竞品与市场信息",
+      "optional": "选填",
+      "competitors": "直接竞品3-5家",
+      "competitorName": "竞品名称",
+      "competitorWebsite": "竞品官网链接",
+      "competitorAdvDisadv": "竞品优劣势",
+      "marketGap": "市场空白/未满足需求",
+      "addCompetitor": "添加竞品"
+    },
+    "geoGoals": {
+      "title": "GEO推广目标",
+      "required": "*必填",
+      "promotionGoals": "推广目标",
+      "keyPromotionArea": "重点推广城市/区域",
+      "forbiddenPromotionArea": "禁止投放区域",
+      "keywordDirection": "关键词方向",
+      "budgetAndRhythm": "预算范围 & 投放节奏",
+      "expectedEffect": "期望效果"
+    },
+    "fileIndex": {
+      "title": "资料上传区",
+      "optional": "选填",
+      "tip": "上传品牌相关资料，AI将基于这些素材进行深度分析。支持PDF、Word、图片、视频等格式。",
+      "certFiles": "企业资质",
+      "certFilesDesc": "营业执照、专利、认证等",
+      "productFiles": "产品手册",
+      "productFilesDesc": "产品参数、卖点文档",
+      "serviceFiles": "服务资料",
+      "serviceFilesDesc": "报价单、套餐方案",
+      "caseFiles": "案例资料",
+      "caseFilesDesc": "项目实拍、案例文档",
+      "fileRemark": "文件备注"
+    },
+    "supplement": {
+      "title": "补充信息与特殊要求",
+      "optional": "选填",
+      "brandForbiddenWords": "品牌禁忌词、禁用文案",
+      "complianceRequirements": "地域合规、行业特殊要求",
+      "previousPromotion": "过往推广经历",
+      "specialRequirements": "其他特殊需求",
+      "versionRemark": "版本备注"
+    }
+  },
+  "bizModels": {
+    "B2B": "B2B",
+    "B2C": "B2C",
+    "localService": "本地服务",
+    "franchise": "招商加盟"
+  },
+  "promotionGoals": {
+    "leads": "获客",
+    "exposure": "曝光",
+    "inquiry": "询盘",
+    "franchise": "加盟",
+    "recruit": "招商"
+  },
+  "keywordDirections": {
+    "local": "同城词",
+    "regional": "区域词",
+    "longTail": "长尾词"
+  },
+  "ai": {
+    "aiSuggest": "AI智能预填",
+    "analyzing": "分析中...",
+    "suggestionGenerated": "AI建议已生成",
+    "suggestionFailed": "AI建议获取失败",
+    "fillFromUrl": "从URL提取",
+    "urlRequired": "请先输入官网地址"
+  },
+  "fileUpload": {
+    "clickOrDrag": "点击或拖拽上传",
+    "remove": "删除"
+  },
+  "history": {
+    "noRecords": "暂无版本记录",
+    "noRemark": "无备注"
+  },
+  "placeholders": {
+    "enterCompanyName": "请输入公司全称",
+    "enterBrandName": "对外使用的品牌名称",
+    "enterIndustry": "如：互联网-企业服务",
+    "enterRegion": "如：广东省深圳市",
+    "enterBizArea": "如：一线城市、新一线城市等",
+    "enterScale": "如：100-500人，2015年成立",
+    "enterWebsite": "https://www.example.com",
+    "enterSocialMedia": "每行一个：公众号:xxx / 抖音:xxx / 小红书:xxx",
+    "enterContactName": "请输入对接人姓名",
+    "enterContactPhone": "请输入联系电话",
+    "enterContactEmail": "请输入邮箱地址",
+    "enterCoreBiz": "用一句话概括您的核心业务",
+    "enterTargetCustomer": "ToB：行业/规模；ToC：人群/年龄/地域",
+    "enterPainPoint": "描述您的目标客户面临的主要问题或痛点",
+    "enterAdvantage": "技术/价格/资质/服务等差异化特点",
+    "enterForbidden": "如：不承接医疗推广；禁忌关键词：夸大、虚假",
+    "enterProductName": "产品名称",
+    "enterProductDesc": "简要描述",
+    "enterSellPoint": "详细描述产品的核心卖点、主要功能和适用场景",
+    "enterServiceDetails": "如：全国服务，交付周期1-3个月，价格区间10-50万",
+    "enterKeyword": "输入关键词后按回车添加",
+    "enterCompetitorName": "竞品名称",
+    "enterCompetitorUrl": "官网链接",
+    "enterCompetitorAnalysis": "分别说明各竞品的优势、劣势，便于AI对比分析",
+    "enterMarketGap": "描述市场中尚未被满足的需求或空白领域",
+    "enterPromotionArea": "如：北京、上海、广州、深圳",
+    "enterForbiddenArea": "如：港澳台、海外",
+    "enterBudget": "如：月预算5万，投放节奏：前期测试20%，中期放量60%，后期优化20%",
+    "enterExpectedEffect": "如：月询盘量50+，区域排名前10，曝光量10万+",
+    "enterFileRemark": "可备注文件用途，便于AI精准检索",
+    "enterForbiddenWords": "如：禁忌词：最、第一、国家级；禁用文案：夸大效果类表述",
+    "enterCompliance": "如：地域合规：禁止投放敏感地区；行业要求：医疗行业需符合广告法",
+    "enterPromotionHistory": "如：2025年做过GEO推广，投放区域为北京、上海，主要关键词为XX",
+    "enterSpecialRequirements": "如有其他特殊需求请在此说明",
+    "enterVersionRemark": "填写本次更新的核心内容，便于版本追溯"
+  },
+  "toast": {
+    "saveSuccess": "知识库保存成功！",
+    "saveFailed": "保存失败: {{error}}",
+    "loadFailed": "加载知识库失败"
+  }
+}

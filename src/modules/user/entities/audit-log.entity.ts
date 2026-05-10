@@ -57,7 +57,7 @@ export class AuditLog {
   @Column({ type: 'boolean', default: false })
   isSensitive: boolean;  // 敏感操作标记
 
-  @Column({ type: 'enum', enum: ['success', 'failure'], default: 'success' })
+  @Column({ type: 'simple-enum', enum: ['success', 'failure'], default: 'success' })
   result: 'success' | 'failure';
 
   @Column({ type: 'text', nullable: true })

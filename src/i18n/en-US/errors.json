@@ -1,0 +1,59 @@
+{
+  "common": {
+    "invalidRequest": "Invalid request",
+    "unauthorized": "Unauthorized, please login first",
+    "forbidden": "You do not have permission to access this resource",
+    "notFound": "Resource not found",
+    "internalError": "Internal server error",
+    "serviceUnavailable": "Service temporarily unavailable",
+    "timeout": "Request timeout"
+  },
+  "auth": {
+    "invalidCredentials": "Invalid username or password",
+    "tokenExpired": "Login expired, please login again",
+    "tokenInvalid": "Invalid authentication token",
+    "accountDisabled": "Account has been disabled",
+    "accountLocked": "Account has been locked"
+  },
+  "knowledge": {
+    "notFound": "Knowledge base not found",
+    "createFailed": "Failed to create knowledge base",
+    "updateFailed": "Failed to update knowledge base",
+    "saveFailed": "Failed to save knowledge base",
+    "uploadFailed": "File upload failed",
+    "fileTooLarge": "File size exceeds limit",
+    "invalidFileType": "Unsupported file type",
+    "aiServiceError": "AI service call failed",
+    "extractionFailed": "Information extraction failed"
+  },
+  "validation": {
+    "required": "Required field cannot be empty",
+    "invalidFormat": "Invalid format",
+    "invalidEmail": "Invalid email format",
+    "invalidUrl": "Invalid URL format",
+    "invalidPhone": "Invalid phone number format",
+    "stringTooLong": "String length exceeds limit",
+    "stringTooShort": "String length is insufficient",
+    "numberOutOfRange": "Number out of allowed range",
+    "invalidEnum": "Invalid option value"
+  },
+  "database": {
+    "connectionFailed": "Database connection failed",
+    "queryFailed": "Database query failed",
+    "transactionFailed": "Transaction failed"
+  },
+  "file": {
+    "uploadFailed": "File upload failed",
+    "downloadFailed": "File download failed",
+    "deleteFailed": "File deletion failed",
+    "fileNotFound": "File not found",
+    "fileTooLarge": "File size exceeds limit",
+    "invalidFileType": "Unsupported file type"
+  },
+  "external": {
+    "paymentFailed": "Payment failed",
+    "paymentTimeout": "Payment timeout",
+    "thirdPartyError": "Third-party service error",
+    "apiRateLimit": "API rate limit exceeded"
+  }
+}

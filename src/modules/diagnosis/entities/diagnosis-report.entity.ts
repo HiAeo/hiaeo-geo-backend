@@ -27,6 +27,12 @@ export class DiagnosisReport {
   @Column({ name: 'user_id' })
   userId: string;
 
+  @Column({ name: 'organization_id', nullable: true })
+  organizationId: string;
+
+  @Column({ name: 'brand_id', nullable: true })
+  brandId: string;
+
   @Column({ name: 'brand_name' })
   brandName: string;
 
@@ -35,7 +41,7 @@ export class DiagnosisReport {
 
   @Column({
     name: 'grade',
-    type: 'enum',
+    type: 'simple-enum',
     enum: ReportGrade,
     default: ReportGrade.FAIR,
   })
@@ -44,16 +50,16 @@ export class DiagnosisReport {
   @Column({ name: 'health_level', type: 'int', default: 0 })
   healthLevel: number;
 
-  @Column({ type: 'jsonb' })
+  @Column({ name: 'dimension_scores', type: 'json' })
   dimensionScores: any[];
 
-  @Column({ type: 'jsonb', nullable: true })
+  @Column({ name: 'competitor_analysis', type: 'json', nullable: true })
   competitorAnalysis: any;
 
-  @Column({ type: 'jsonb' })
+  @Column({ type: 'json' })
   issues: any[];
 
-  @Column({ type: 'jsonb' })
+  @Column({ type: 'json' })
   suggestions: any[];
 
   @Column({ name: 'executive_summary', type: 'text' })
@@ -62,10 +68,10 @@ export class DiagnosisReport {
   @Column({ name: 'ai_insights', type: 'text', nullable: true })
   aiInsights: string;
 
-  @Column({ type: 'jsonb', nullable: true })
+  @Column({ name: 'raw_ai_response', type: 'json', nullable: true })
   rawAiResponse: Record<string, any>;
 
-  @Column({ name: 'engines_used', type: 'jsonb', default: [] })
+  @Column({ name: 'engines_used', type: 'json', default: '[]' })
   enginesUsed: string[];
 
   @CreateDateColumn({ name: 'created_at' })

@@ -26,6 +26,24 @@ export class Content {
   @Column({ name: 'user_id' })
   userId: string;
 
+  @Column({ name: 'organization_id', nullable: true })
+  organizationId: string;
+
+  @Column({ name: 'brand_id', nullable: true })
+  brandId: string;
+
+  @Column({ type: 'boolean', default: false })
+  published: boolean;
+
+  @Column({ length: 50, nullable: true })
+  platform: string;
+
+  @Column({ length: 50, nullable: true })
+  aiEngine: string;
+
+  @Column({ type: 'int', default: 0 })
+  engagement: number;
+
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
 

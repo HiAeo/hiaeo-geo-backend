@@ -13,6 +13,13 @@ export declare class WenxinAdapter implements AIEngineAdapter {
     diagnoseBrand(params: BrandDiagnosisParams): Promise<BrandDiagnosisResult>;
     generateContent(params: ContentGenerationParams): Promise<ContentGenerationResult>;
     chat(params: ChatParams): Promise<ChatResult>;
+    isAvailable(): boolean;
+    diagnoseSEO(params: {
+        targetUrl: string;
+        targetName?: string;
+        targetIndustry?: string;
+        keywords?: string[];
+    }): Promise<any>;
     private buildDiagnosisPrompt;
     private buildContentPrompt;
     private parseDiagnosisResult;

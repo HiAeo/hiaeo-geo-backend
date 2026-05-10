@@ -43,11 +43,11 @@ __decorate([
     __metadata("design:type", String)
 ], Invoice.prototype, "invoiceNo", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ type: 'enum', enum: InvoiceType }),
+    (0, typeorm_1.Column)({ type: 'simple-enum', enum: InvoiceType }),
     __metadata("design:type", String)
 ], Invoice.prototype, "type", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ type: 'enum', enum: InvoiceStatus, default: InvoiceStatus.PENDING }),
+    (0, typeorm_1.Column)({ type: 'simple-enum', enum: InvoiceStatus, default: InvoiceStatus.PENDING }),
     __metadata("design:type", String)
 ], Invoice.prototype, "status", void 0);
 __decorate([
@@ -127,7 +127,7 @@ __decorate([
     __metadata("design:type", String)
 ], Invoice.prototype, "email", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ type: 'timestamp', nullable: true }),
+    (0, typeorm_1.Column)({ type: 'datetime', nullable: true }),
     __metadata("design:type", Date)
 ], Invoice.prototype, "issuedAt", void 0);
 __decorate([

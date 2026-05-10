@@ -9,6 +9,8 @@ export declare class DiagnosisReport {
     id: string;
     taskId: string;
     userId: string;
+    organizationId: string;
+    brandId: string;
     brandName: string;
     overallScore: number;
     grade: ReportGrade;

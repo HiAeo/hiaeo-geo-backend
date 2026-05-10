@@ -1,0 +1,59 @@
+{
+  "common": {
+    "invalidRequest": "无效的请求",
+    "unauthorized": "未授权，请先登录",
+    "forbidden": "无权访问此资源",
+    "notFound": "资源不存在",
+    "internalError": "服务器内部错误",
+    "serviceUnavailable": "服务暂不可用",
+    "timeout": "请求超时"
+  },
+  "auth": {
+    "invalidCredentials": "用户名或密码错误",
+    "tokenExpired": "登录已过期，请重新登录",
+    "tokenInvalid": "无效的认证令牌",
+    "accountDisabled": "账号已被禁用",
+    "accountLocked": "账号已被锁定"
+  },
+  "knowledge": {
+    "notFound": "知识库不存在",
+    "createFailed": "创建知识库失败",
+    "updateFailed": "更新知识库失败",
+    "saveFailed": "保存知识库失败",
+    "uploadFailed": "文件上传失败",
+    "fileTooLarge": "文件大小超出限制",
+    "invalidFileType": "不支持的文件类型",
+    "aiServiceError": "AI服务调用失败",
+    "extractionFailed": "信息提取失败"
+  },
+  "validation": {
+    "required": "必填字段不能为空",
+    "invalidFormat": "格式不正确",
+    "invalidEmail": "邮箱格式不正确",
+    "invalidUrl": "URL格式不正确",
+    "invalidPhone": "手机号格式不正确",
+    "stringTooLong": "字符长度超出限制",
+    "stringTooShort": "字符长度不足",
+    "numberOutOfRange": "数值超出允许范围",
+    "invalidEnum": "无效的选项值"
+  },
+  "database": {
+    "connectionFailed": "数据库连接失败",
+    "queryFailed": "数据库查询失败",
+    "transactionFailed": "事务执行失败"
+  },
+  "file": {
+    "uploadFailed": "文件上传失败",
+    "downloadFailed": "文件下载失败",
+    "deleteFailed": "文件删除失败",
+    "fileNotFound": "文件不存在",
+    "fileTooLarge": "文件大小超出限制",
+    "invalidFileType": "不支持的文件类型"
+  },
+  "external": {
+    "paymentFailed": "支付失败",
+    "paymentTimeout": "支付超时",
+    "thirdPartyError": "第三方服务错误",
+    "apiRateLimit": "API调用频率超限"
+  }
+}

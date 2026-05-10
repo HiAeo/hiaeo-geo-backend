@@ -1,8 +1,7 @@
+import { DataSourceService } from './data-source.service';
 export declare class HubService {
-    private stats;
-    private bossStats;
-    private techStats;
-    private opsStats;
+    private dataSource;
+    constructor(dataSource: DataSourceService);
     getStats(brandId?: string): Promise<{
         success: boolean;
         data: {
@@ -14,67 +13,44 @@ export declare class HubService {
             freeUsers: number;
             proUsers: number;
             enterpriseUsers: number;
+            totalBrands: number;
+            totalDiagnoses: number;
+            completedDiagnoses: number;
+            totalContent: number;
+            publishedContent: number;
         };
     }>;
     getBossView(brandId?: string): Promise<{
         success: boolean;
         data: {
-            stats: {
-                geoScore: number;
-                industryAvg: number;
-                mentionRate: number;
-                mentionTarget: number;
-                competitorSuppression: number;
-                competitorCount: number;
-                roi: number;
-            };
+            stats: import("./data-source.service").BrandStats;
             brandId: string | undefined;
         };
     }>;
-    getOpsView(brandId?: string): Promise<{
+    getOpsView(brandId?: string, organizationId?: string): Promise<{
         success: boolean;
         data: {
-            stats: {
-                pendingCount: number;
-                totalContent: number;
-                publishedContent: number;
-                pendingContent: number;
-                avgEngagement: number;
-            };
+            stats: import("./data-source.service").OpsStats;
             pendingTasks: {
-                success: boolean;
-                data: {
-                    id: number;
-                    title: string;
-                    style: string;
-                    platform: string;
-                    impact: number;
-                    status: string;
-                }[];
-                brandId: string | undefined;
-            };
+                id: string;
+                title: string;
+                style: string;
+                platform: string;
+                impact: number;
+                status: string;
+            }[];
             suggestions: {
-                success: boolean;
-                data: {
-                    text: string;
-                    tag: string;
-                    priority: string;
-                }[];
-                brandId: string | undefined;
-            };
+                text: string;
+                tag: string;
+                priority: "high" | "medium" | "low";
+            }[];
             brandId: string | undefined;
         };
     }>;
-    getTechView(brandId?: string): Promise<{
+    getTechView(brandId?: string, organizationId?: string): Promise<{
         success: boolean;
         data: {
-            stats: {
-                apiHealth: number;
-                crawlerScore: number;
-                schemaScore: number;
-                performance: number;
-                pendingTasks: number;
-            };
+            stats: import("./data-source.service").TechStats;
             tasks: {
                 id: number;
                 title: string;
@@ -91,10 +67,10 @@ export declare class HubService {
             brandId: string | undefined;
         };
     }>;
-    getBrandRanking(): Promise<{
+    getBrandRanking(organizationId?: string): Promise<{
         success: boolean;
         data: {
-            id: number;
+            id: string;
             name: string;
             score: number;
             mentionRate: number;
@@ -102,7 +78,7 @@ export declare class HubService {
             isCurrentBrand: boolean;
         }[];
     }>;
-    getVisibilityTrend(period?: string): Promise<{
+    getVisibilityTrend(period?: string, organizationId?: string): Promise<{
         success: boolean;
         data: {
             date: string;
@@ -110,10 +86,10 @@ export declare class HubService {
         }[];
         period: string;
     }>;
-    getPendingTasks(brandId?: string): Promise<{
+    getPendingTasks(brandId?: string, organizationId?: string): Promise<{
         success: boolean;
         data: {
-            id: number;
+            id: string;
             title: string;
             style: string;
             platform: string;
@@ -122,12 +98,12 @@ export declare class HubService {
         }[];
         brandId: string | undefined;
     }>;
-    getSuggestions(brandId?: string): Promise<{
+    getSuggestions(brandId?: string, organizationId?: string): Promise<{
         success: boolean;
         data: {
             text: string;
             tag: string;
-            priority: string;
+            priority: "high" | "medium" | "low";
         }[];
         brandId: string | undefined;
     }>;

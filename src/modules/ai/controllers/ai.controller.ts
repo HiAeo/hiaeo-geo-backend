@@ -17,6 +17,21 @@ export class AiController {
     return this.aiService.getEngineList();
   }
 
+  @Get('engines/health')
+  @ApiOperation({ summary: '获取引擎健康状态' })
+  @ApiResponse({ status: 200, description: '返回所有引擎的健康状态' })
+  async getEngineHealthStatus() {
+    return this.aiService.getEngineHealthStatus();
+  }
+
+  @Get('engines/recommend')
+  @ApiOperation({ summary: '推荐最佳引擎' })
+  @ApiQuery({ name: 'taskType', required: true, description: '任务类型: diagnosis, content, chat' })
+  @ApiResponse({ status: 200, description: '返回推荐的引擎名称' })
+  async recommendEngine(@Query('taskType') taskType: 'diagnosis' | 'content' | 'chat') {
+    return this.aiService.recommendEngine(taskType);
+  }
+
   @Post('diagnose')
   @ApiOperation({ summary: '品牌GEO诊断' })
   @ApiQuery({ name: 'engine', required: false, description: '指定引擎类型' })

@@ -12,7 +12,7 @@ export declare class User {
     name: string;
     phone: string;
     avatar: string;
-    status: UserStatus;
+    status: string;
     organizationId: string;
     brandId: string;
     roleId: string;

@@ -8,6 +8,7 @@ import { PackageService } from '../../package/services/package.service';
 import { SubscriptionService } from '../../subscription/services/subscription.service';
 import { CreditService } from '../../subscription/services/credit.service';
 import { SourceType } from '../../subscription/entities/credit.entity';
+import { InvitationService } from '../../invitation/services/invitation.service';
 
 export interface CreateOrderDto {
   packageId?: string;
@@ -52,6 +53,7 @@ export class OrderService {
     private packageService: PackageService,
     private subscriptionService: SubscriptionService,
     private creditService: CreditService,
+    private invitationService: InvitationService,
     private dataSource: DataSource,
   ) {}
 
@@ -248,6 +250,13 @@ export class OrderService {
   }
 
   /**
+   * 通过支付号获取支付记录
+   */
+  async getPaymentByPaymentNo(paymentNo: string) {
+    return this.paymentRepository.findOne({ where: { paymentNo } });
+  }
+
+  /**
    * 完成订单支付（回调）
    */
   async completeOrder(orderId: string, callback: PaymentCallback) {
@@ -305,6 +314,13 @@ export class OrderService {
         } catch (error) {
           console.error('创建订阅失败:', error);
         }
+      }
+
+      // 完成邀请（如果有）
+      try {
+        await this.invitationService.completeInvitation(orderId, order.userId);
+      } catch (error) {
+        console.error('完成邀请奖励失败:', error);
       }
 
       await queryRunner.commitTransaction();
