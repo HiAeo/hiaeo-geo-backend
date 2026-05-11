@@ -17,8 +17,21 @@ async function bootstrap() {
   app.setGlobalPrefix('api');
 
   // CORS配置
+  const allowedOrigins = [
+    'https://www.modelbuddy.net',
+    'https://hiaeo-geo-frontend-hkmtfkakb-hi-aeo.vercel.app',
+    'http://localhost:3000',
+    'http://localhost:5173',
+  ];
   app.enableCors({
-    origin: process.env.CORS_ORIGIN || '*',
+    origin: (origin, callback) => {
+      // 允许没有 origin 的请求（如 Postman、curl）
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
     credentials: true,
   });

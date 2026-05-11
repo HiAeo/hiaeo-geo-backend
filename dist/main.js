@@ -12,8 +12,21 @@ async function bootstrap() {
         forbidNonWhitelisted: false,
     }));
     app.setGlobalPrefix('api');
+    const allowedOrigins = [
+        'https://www.modelbuddy.net',
+        'https://hiaeo-geo-frontend-hkmtfkakb-hi-aeo.vercel.app',
+        'http://localhost:3000',
+        'http://localhost:5173',
+    ];
     app.enableCors({
-        origin: process.env.CORS_ORIGIN || '*',
+        origin: (origin, callback) => {
+            if (!origin || allowedOrigins.includes(origin)) {
+                callback(null, true);
+            }
+            else {
+                callback(new Error('Not allowed by CORS'));
+            }
+        },
         methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
         credentials: true,
     });
