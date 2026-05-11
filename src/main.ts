@@ -16,24 +16,14 @@ async function bootstrap() {
   // 全局API前缀
   app.setGlobalPrefix('api');
 
-  // CORS配置
-  const allowedOrigins = [
-    'https://www.modelbuddy.net',
-    'https://hiaeo-geo-frontend-hkmtfkakb-hi-aeo.vercel.app',
-    'http://localhost:3000',
-    'http://localhost:5173',
-  ];
+  // CORS配置 - 支持所有来源用于开发
   app.enableCors({
-    origin: (origin, callback) => {
-      // 允许没有 origin 的请求（如 Postman、curl）
-      if (!origin || allowedOrigins.includes(origin)) {
-        callback(null, true);
-      } else {
-        callback(new Error('Not allowed by CORS'));
-      }
-    },
+    origin: '*',
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
+    allowedHeaders: ['Content-Type', 'Authorization', 'Accept', 'Origin', 'X-Requested-With'],
     credentials: true,
+    preflightContinue: false,
+    optionsSuccessStatus: 204,
   });
 
   // Swagger文档配置
