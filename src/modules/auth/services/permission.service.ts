@@ -35,7 +35,7 @@ export class PermissionService {
     }
 
     // 如果用户是超级管理员，直接返回 true
-    if (user.role?.name === 'super_admin') {
+    if (user.role?.code === 'super_admin') {
       return true;
     }
 
@@ -78,7 +78,7 @@ export class PermissionService {
     }
 
     // 如果用户是超级管理员，直接返回 true
-    if (user.role?.name === 'super_admin') {
+    if (user.role?.code === 'super_admin') {
       return true;
     }
 
@@ -119,7 +119,7 @@ export class PermissionService {
     }
 
     // 如果用户是超级管理员，返回所有权限
-    if (user.role?.name === 'super_admin') {
+    if (user.role?.code === 'super_admin') {
       const allPermissions = await this.permissionRepository.find({
         where: { isActive: true },
       });

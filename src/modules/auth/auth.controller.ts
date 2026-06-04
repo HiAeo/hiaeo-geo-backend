@@ -1,7 +1,7 @@
 import { Controller, Post, Body, Get, UseGuards, Req, Ip } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
-import { LoginDto, RegisterDto, RefreshTokenDto, ChangePasswordDto } from './dto/auth.dto';
+import { LoginDto, RegisterDto, RefreshTokenDto, ChangePasswordDto, PhoneLoginDto, PhoneRegisterDto } from './dto/auth.dto';
 import { AuthResponseDto, UserInfoDto } from './dto/auth-response.dto';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { OptionalJwtAuthGuard } from './guards/optional-jwt-auth.guard';
@@ -12,7 +12,7 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('login')
-  @ApiOperation({ summary: '用户登录' })
+  @ApiOperation({ summary: '用户登录（邮箱）' })
   @ApiResponse({ status: 200, description: '登录成功', type: AuthResponseDto })
   @ApiResponse({ status: 401, description: '认证失败' })
   async login(@Body() dto: LoginDto, @Req() req: any, @Ip() ip: string): Promise<AuthResponseDto> {
@@ -20,12 +20,29 @@ export class AuthController {
     return this.authService.login(dto, clientIp);
   }
 
+  @Post('phone-login')
+  @ApiOperation({ summary: '手机号登录（小智专用）' })
+  @ApiResponse({ status: 200, description: '登录成功', type: AuthResponseDto })
+  @ApiResponse({ status: 401, description: '认证失败' })
+  async phoneLogin(@Body() dto: PhoneLoginDto, @Req() req: any, @Ip() ip: string): Promise<AuthResponseDto> {
+    const clientIp = ip || req.ip || req.connection?.remoteAddress || 'unknown';
+    return this.authService.phoneLogin(dto, clientIp);
+  }
+
   @Post('register')
-  @ApiOperation({ summary: '用户注册' })
+  @ApiOperation({ summary: '用户注册（邮箱）' })
   @ApiResponse({ status: 201, description: '注册成功', type: AuthResponseDto })
   @ApiResponse({ status: 400, description: '请求参数错误或邮箱已存在' })
   async register(@Body() dto: RegisterDto): Promise<AuthResponseDto> {
     return this.authService.register(dto);
+  }
+
+  @Post('phone-register')
+  @ApiOperation({ summary: '手机号注册（小智专用）' })
+  @ApiResponse({ status: 201, description: '注册成功', type: AuthResponseDto })
+  @ApiResponse({ status: 400, description: '请求参数错误或手机号已注册' })
+  async phoneRegister(@Body() dto: PhoneRegisterDto): Promise<AuthResponseDto> {
+    return this.authService.phoneRegister(dto);
   }
 
   @Post('refresh')

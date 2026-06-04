@@ -8,7 +8,7 @@ import { User, UserStatus } from '../user/entities/user.entity';
 import { Organization, OrganizationType } from '../user/entities/organization.entity';
 import { Role, RoleType } from '../user/entities/role.entity';
 import * as bcrypt from 'bcryptjs';
-import { LoginDto, RegisterDto, RefreshTokenDto, ChangePasswordDto } from './dto/auth.dto';
+import { LoginDto, RegisterDto, RefreshTokenDto, ChangePasswordDto, PhoneLoginDto, PhoneRegisterDto } from './dto/auth.dto';
 import { AuthResponseDto, UserInfoDto } from './dto/auth-response.dto';
 
 @Injectable()
@@ -110,6 +110,88 @@ export class AuthService {
     const fullUser = await this.userService.findOne(user.id);
 
     // 生成 Token
+    return this.generateTokens(fullUser);
+  }
+
+  /**
+   * 手机号登录（小智聊天页专用）
+   */
+  async phoneLogin(dto: PhoneLoginDto, ip?: string): Promise<AuthResponseDto> {
+    const user = await this.userRepository.findOne({
+      where: { phone: dto.phone, status: UserStatus.ACTIVE },
+      relations: ['role'],
+    });
+
+    if (!user) {
+      throw new UnauthorizedException('手机号或密码错误');
+    }
+
+    const isValid = await bcrypt.compare(dto.password, user.password);
+    if (!isValid) {
+      throw new UnauthorizedException('手机号或密码错误');
+    }
+
+    if (ip) {
+      await this.userService.updateLastLogin(user.id, ip);
+    }
+
+    return this.generateTokens(user);
+  }
+
+  /**
+   * 手机号注册（小智聊天页专用，只需手机号+密码）
+   */
+  async phoneRegister(dto: PhoneRegisterDto): Promise<AuthResponseDto> {
+    // 检查手机号是否已注册
+    const existingByPhone = await this.userRepository.findOne({
+      where: { phone: dto.phone },
+    });
+    if (existingByPhone) {
+      throw new BadRequestException('该手机号已被注册');
+    }
+
+    // 用手机号生成 email（避免唯一约束冲突）
+    const autoEmail = `${dto.phone}@xiaozhi.local`;
+
+    // 创建组织（个人用户）
+    let organization = await this.organizationRepository.findOne({
+      where: { name: `用户${dto.phone}的团队` },
+    });
+    if (!organization) {
+      organization = this.organizationRepository.create({
+        name: `用户${dto.phone}的团队`,
+        type: OrganizationType.INDIVIDUAL,
+      });
+      organization = await this.organizationRepository.save(organization);
+    }
+
+    // 获取默认角色（查看者）
+    const defaultRole = await this.roleRepository.findOne({
+      where: { code: RoleType.VIEWER },
+    });
+    if (!defaultRole) {
+      throw new BadRequestException('系统角色配置错误');
+    }
+
+    // 加密密码
+    const hashedPassword = await bcrypt.hash(dto.password, 10);
+
+    // 创建用户：name 取手机号后4位
+    const user = this.userRepository.create({
+      email: autoEmail,
+      password: hashedPassword,
+      name: `用户${dto.phone.slice(-4)}`,
+      phone: dto.phone,
+      organizationId: organization.id,
+      roleId: defaultRole.id,
+      status: UserStatus.ACTIVE,
+      emailVerified: false,
+      createdBy: '',
+    });
+    await this.userRepository.save(user);
+
+    // 重新加载用户
+    const fullUser = await this.userService.findOne(user.id);
     return this.generateTokens(fullUser);
   }
 

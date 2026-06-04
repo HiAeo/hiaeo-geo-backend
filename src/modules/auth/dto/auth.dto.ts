@@ -1,4 +1,4 @@
-import { IsEmail, IsString, MinLength, MaxLength, IsOptional } from 'class-validator';
+import { IsEmail, IsString, MinLength, MaxLength, IsOptional, Matches } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class LoginDto {
@@ -34,6 +34,30 @@ export class RegisterDto {
   @IsOptional()
   @IsString()
   phone?: string;
+}
+
+/** 手机号登录（小智聊天页专用） */
+export class PhoneLoginDto {
+  @ApiProperty({ description: '手机号', example: '13800138000' })
+  @Matches(/^1\d{10}$/, { message: '请输入正确的手机号' })
+  phone: string;
+
+  @ApiProperty({ description: '密码', example: '123456' })
+  @IsString()
+  @MinLength(6, { message: '密码至少6个字符' })
+  password: string;
+}
+
+/** 手机号注册（小智聊天页专用） */
+export class PhoneRegisterDto {
+  @ApiProperty({ description: '手机号', example: '13800138000' })
+  @Matches(/^1\d{10}$/, { message: '请输入正确的手机号' })
+  phone: string;
+
+  @ApiProperty({ description: '密码', example: '123456' })
+  @IsString()
+  @MinLength(6, { message: '密码至少6个字符' })
+  password: string;
 }
 
 export class RefreshTokenDto {
