@@ -23,6 +23,10 @@ import { TeamModule } from './modules/team/team.module';
 import { KnowledgeModule } from './modules/knowledge/knowledge.module';
 import { WorkflowModule } from './modules/workflow/workflow.module';
 import { I18nModule } from './modules/i18n/i18n.module';
+import { WorkflowStateModule } from './modules/workflow-state/workflow-state.module';
+import { IntelligenceModule } from './modules/intelligence/intelligence.module';
+import { OptimizationModule } from './modules/optimization/optimization.module';
+import { XiaoZhiModule } from './modules/xiaozhi/xiaozhi.module';
 
 @Module({
   imports: [
@@ -49,7 +53,11 @@ import { I18nModule } from './modules/i18n/i18n.module';
     TeamModule,
     KnowledgeModule,
     WorkflowModule,
+    WorkflowStateModule,
+    IntelligenceModule,
+    OptimizationModule,
     I18nModule,
+    XiaoZhiModule,
   ],
   controllers: [],
   providers: [],
