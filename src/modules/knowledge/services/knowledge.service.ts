@@ -10,6 +10,7 @@ import {
   KnowledgeVersionDto,
   AiSuggestResponseDto,
 } from '../dto/knowledge.dto';
+import { KnowledgeVersionService } from './knowledge-version.service';
 
 @Injectable()
 export class KnowledgeService {
@@ -18,6 +19,7 @@ export class KnowledgeService {
   constructor(
     @InjectRepository(BrandKnowledgeBase)
     private readonly knowledgeRepository: Repository<BrandKnowledgeBase>,
+    private readonly knowledgeVersionService: KnowledgeVersionService,
   ) {}
 
   /**
@@ -42,7 +44,6 @@ export class KnowledgeService {
     organizationId: string,
     dto: CreateKnowledgeBaseDto,
   ): Promise<GetKnowledgeBaseDto> {
-    // 检查是否已存在
     const existing = await this.knowledgeRepository.findOne({
       where: { organizationId },
     });
@@ -56,11 +57,18 @@ export class KnowledgeService {
       basicInfo: dto.basicInfo || {},
       bizPositioning: dto.bizPositioning || {},
       productService: dto.productService || {},
+      competitorMarket: dto.competitorMarket || {},
       geoGoals: dto.geoGoals || {},
+      supplement: dto.supplement || {},
+      fileIndex: {},
       version: 1,
     });
 
     const saved = await this.knowledgeRepository.save(knowledge);
+    
+    // 创建初始版本快照
+    await this.knowledgeVersionService.createSnapshot(organizationId, saved);
+    
     return this.mapToDto(saved);
   }
 
@@ -76,14 +84,12 @@ export class KnowledgeService {
     });
 
     if (!knowledge) {
-      // 不存在则创建
       return this.createKnowledgeBase(organizationId, dto as CreateKnowledgeBaseDto);
     }
 
     // 记录变更字段
     const changedFields: string[] = [];
 
-    // 合并更新
     if (dto.basicInfo !== undefined) {
       knowledge.basicInfo = { ...knowledge.basicInfo, ...dto.basicInfo };
       changedFields.push('basicInfo');
@@ -113,6 +119,10 @@ export class KnowledgeService {
     knowledge.version += 1;
 
     const saved = await this.knowledgeRepository.save(knowledge);
+    
+    // 创建版本快照
+    await this.knowledgeVersionService.createSnapshot(organizationId, saved, changedFields);
+    
     this.logger.log(
       `Knowledge base updated for org ${organizationId}, version: ${knowledge.version}, changed fields: ${changedFields.join(', ')}`,
     );
@@ -121,8 +131,7 @@ export class KnowledgeService {
   }
 
   /**
-   * 上传文件（记录元信息）
-   * 实际文件存储暂用本地路径，后续集成COS
+   * 上传文件
    */
   async uploadFile(
     organizationId: string,
@@ -134,7 +143,6 @@ export class KnowledgeService {
     });
 
     if (!knowledge) {
-      // 自动创建知识库
       const created = await this.createKnowledgeBase(organizationId, {});
       knowledge = await this.knowledgeRepository.findOne({
         where: { organizationId },
@@ -144,14 +152,25 @@ export class KnowledgeService {
       }
     }
 
+    // 处理中文文件名乱码：Multer 默认使用 Latin-1 解码，需要转回 UTF-8
+    let originalName = file.originalname;
+    try {
+      // 如果文件名是 Latin-1 编码的中文，尝试转回 UTF-8
+      if (/[\u00c0-\u00ff]/.test(originalName) || originalName.includes('Ã')) {
+        const bytes = Array.from(originalName).map((c: string) => c.charCodeAt(0));
+        originalName = new TextDecoder('utf-8').decode(new Uint8Array(bytes));
+      }
+    } catch {
+      // 解码失败则使用原文件名
+    }
+
     const fileInfo = {
       fileId: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-      name: file.originalname,
-      url: `/uploads/knowledge/${organizationId}/${module}/${file.originalname}`,
+      name: originalName,
+      url: `/uploads/knowledge/${organizationId}/${module}/${originalName}`,
       uploadedAt: new Date().toISOString(),
     };
 
-    // 更新fileIndex
     const fileIndex = knowledge.fileIndex || {};
     if (!fileIndex[module]) {
       (fileIndex as any)[module] = [];
@@ -166,7 +185,7 @@ export class KnowledgeService {
       fileId: fileInfo.fileId,
       url: fileInfo.url,
       status: 'uploaded',
-      fileName: file.originalname,
+      fileName: originalName,
       fileSize: file.size,
     };
   }
@@ -186,7 +205,6 @@ export class KnowledgeService {
     let found = false;
     const fileIndex: any = { ...knowledge.fileIndex };
 
-    // 遍历所有文件数组，查找并删除
     for (const module of Object.keys(fileIndex)) {
       const files = fileIndex[module] || [];
       if (!Array.isArray(files)) continue;
@@ -210,41 +228,20 @@ export class KnowledgeService {
   }
 
   /**
-   * 获取版本历史
+   * 获取版本历史（使用版本服务）
    */
   async getVersionHistory(
     organizationId: string,
     page: number = 1,
     size: number = 10,
   ): Promise<{ list: KnowledgeVersionDto[]; total: number }> {
-    // 简化版本：仅返回当前版本信息
-    const knowledge = await this.knowledgeRepository.findOne({
-      where: { organizationId },
-    });
-
-    if (!knowledge) {
-      return { list: [], total: 0 };
-    }
-
-    return {
-      list: [
-        {
-          version: knowledge.version,
-          updatedAt: knowledge.updatedAt,
-          changedFields: [],
-          versionRemark: knowledge.supplement?.versionRemark,
-        },
-      ],
-      total: 1,
-    };
+    return this.knowledgeVersionService.getVersionHistory(organizationId, page, size);
   }
 
   /**
-   * AI智能建议（模拟实现）
+   * AI智能建议
    */
   async getAiSuggestion(field: string, source?: string): Promise<AiSuggestResponseDto> {
-    // TODO: 后续集成AI服务进行智能提取
-    // 暂时返回模拟数据
     const suggestions: Record<string, string> = {
       companyName: '建议填写公司全称，便于AI精准匹配',
       industry: '建议填写所属行业，如：科技、教育、医疗等',

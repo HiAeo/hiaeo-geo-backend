@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, Inject, forwardRef } from '@nestjs/common';
 import { AiService } from '../../ai/services/ai.service';
 
 /**
@@ -12,7 +12,10 @@ export class EmbeddingService {
   // 向量维度配置（基于 text-embedding-3-small）
   private readonly EMBEDDING_DIMENSIONS = 1536;
 
-  constructor(private readonly aiService: AiService) {}
+  constructor(
+    @Inject(forwardRef(() => AiService))
+    private readonly aiService: AiService,
+  ) {}
 
   /**
    * 生成文本向量嵌入

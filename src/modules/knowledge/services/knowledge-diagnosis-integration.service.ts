@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, Inject, forwardRef } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { BrandKnowledgeBase } from '../entities/brand-knowledge-base.entity';
@@ -17,6 +17,7 @@ export class KnowledgeDiagnosisIntegrationService {
   constructor(
     @InjectRepository(BrandKnowledgeBase)
     private knowledgeRepository: Repository<BrandKnowledgeBase>,
+    @Inject(forwardRef(() => DiagnosisTaskService))
     private diagnosisTaskService: DiagnosisTaskService,
     @InjectRepository(DiagnosisReport)
     private reportRepository: Repository<DiagnosisReport>,
