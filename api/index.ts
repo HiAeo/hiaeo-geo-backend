@@ -43,6 +43,36 @@ export default async function handler(req: any, res: any) {
       return res.status(200).json({ status: 'ok', timestamp: new Date().toISOString() });
     }
 
+    // 数据库连接诊断
+    if (pathname === '/api/db-test') {
+      try {
+        const { Pool } = require('pg');
+        const dbUrl = process.env.DATABASE_URL || 'not set';
+        const pool = new Pool({
+          connectionString: dbUrl,
+          ssl: { rejectUnauthorized: false },
+          connectionTimeoutMillis: 10000,
+          max: 1,
+        });
+        const result = await pool.query('SELECT 1 as ok, NOW() as time');
+        await pool.end();
+        return res.status(200).json({
+          status: 'connected',
+          dbUrl: dbUrl.replace(/:[^:@]+@/, ':****@'),
+          result: result.rows[0],
+          envKeys: Object.keys(process.env).filter(k => k.includes('DB') || k.includes('DATABASE') || k.includes('JWT')),
+        });
+      } catch (e: any) {
+        return res.status(500).json({
+          status: 'error',
+          message: e.message,
+          code: e.code,
+          dbUrlSet: !!process.env.DATABASE_URL,
+          dbUrlPreview: (process.env.DATABASE_URL || '').replace(/:[^:@]+@/, ':****@').substring(0, 80),
+        });
+      }
+    }
+
     // 跳过 Swagger 文档请求
     if (pathname.startsWith('/api/docs') || pathname === '/api/docs-json') {
       return res.status(404).json({ message: 'Swagger not available' });
